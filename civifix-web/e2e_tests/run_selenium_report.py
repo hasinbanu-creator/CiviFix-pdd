@@ -86,6 +86,7 @@ def body_text(driver: webdriver.Chrome) -> str:
 
 def clear_storage(driver: webdriver.Chrome):
     driver.execute_script("window.localStorage.clear(); window.sessionStorage.clear();")
+    driver.delete_all_cookies()
 
 def set_role_session(driver: webdriver.Chrome, role: str):
     driver.get(BASE_URL)
