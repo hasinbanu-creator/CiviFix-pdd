@@ -157,10 +157,7 @@ def submit_signup_flow(driver: webdriver.Chrome):
     type_input(driver, "signup-mobile", "9876543210")
     type_input(driver, "signup-email", "signup@civifix.local")
     click_button_with_text(driver, "NEXT")
-    try:
-        WebDriverWait(driver, DEFAULT_TIMEOUT).until(lambda d: len(d.find_elements(By.XPATH, "//select")) > 0)
-    except Exception:
-        pass
+    WebDriverWait(driver, DEFAULT_TIMEOUT).until(lambda d: "Step 2 of 2" in body_text(d))
     driver.execute_script("window.localStorage.setItem('e2eRole', 'CITIZEN');")
     Select(driver.find_element(By.XPATH, "//select[option[contains(., 'Select District')]]")).select_by_value("e2e-district-1")
     WebDriverWait(driver, DEFAULT_TIMEOUT).until(lambda d: len(d.find_elements(By.XPATH, "//select[option[contains(., 'Select Ward')]]/option")) > 1)
@@ -170,10 +167,7 @@ def submit_signup_flow(driver: webdriver.Chrome):
     )
     terms_button.click()
     click_button_with_text(driver, "CREATE ACCOUNT")
-    try:
-        WebDriverWait(driver, DEFAULT_TIMEOUT).until(lambda d: len(d.find_elements(By.CSS_SELECTOR, "input[inputmode='numeric']")) > 0)
-    except Exception:
-        pass
+    WebDriverWait(driver, DEFAULT_TIMEOUT).until(lambda d: "Check your email" in body_text(d))
     for index, otp_input in enumerate(driver.find_elements(By.CSS_SELECTOR, "input[inputmode='numeric']")):
         otp_input.send_keys(str((index + 1) % 10))
     click_button_with_text(driver, "VERIFY ACCOUNT")
@@ -184,20 +178,14 @@ def submit_signup_flow(driver: webdriver.Chrome):
 def submit_complaint_flow(driver: webdriver.Chrome) -> str:
     set_role_session(driver, "CITIZEN")
     open_route(driver, "/complaints/create")
-    try:
-        WebDriverWait(driver, DEFAULT_TIMEOUT).until(lambda d: len(d.find_elements(By.TAG_NAME, "select")) > 0)
-    except Exception:
-        pass
+    WebDriverWait(driver, DEFAULT_TIMEOUT).until(lambda d: "Raise a Complaint" in body_text(d))
     Select(driver.find_element(By.XPATH, "//select[option[contains(., 'Select a category')]]")).select_by_value("GARBAGE")
     textarea = driver.find_element(By.XPATH, "//textarea[contains(@placeholder, 'Describe the issue clearly')]")
     textarea.clear()
     textarea.send_keys("Garbage has not been collected near the community park for several days.")
     Select(driver.find_element(By.XPATH, "//select[option[contains(., 'Select your ward')]]")).select_by_value("e2e-ward-1")
     click_button_with_text(driver, "Submit Complaint")
-    try:
-        WebDriverWait(driver, DEFAULT_TIMEOUT).until(lambda d: len(d.find_elements(By.XPATH, "//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'view')]")) > 0)
-    except Exception:
-        pass
+    WebDriverWait(driver, DEFAULT_TIMEOUT).until(lambda d: "Complaint Submitted!" in body_text(d))
     click_button_with_text(driver, "View Complaint")
     WebDriverWait(driver, DEFAULT_TIMEOUT).until(lambda d: "/complaints/" in d.current_url)
     wait_ready(driver)
@@ -213,10 +201,7 @@ def handle_alert_if_present(driver: webdriver.Chrome):
 def submit_inspector_action(driver: webdriver.Chrome, action: str) -> str:
     set_role_session(driver, "INSPECTOR")
     open_route(driver, "/complaints/e2e-complaint-2")
-    try:
-        WebDriverWait(driver, DEFAULT_TIMEOUT).until(lambda d: len(d.find_elements(By.TAG_NAME, "button")) > 0)
-    except Exception:
-        pass
+    WebDriverWait(driver, DEFAULT_TIMEOUT).until(lambda d: "Complaint Details" in body_text(d))
     if action == "start":
         click_button_with_text(driver, "Start Work")
     elif action == "reject":
@@ -448,40 +433,70 @@ def execute_case(driver: webdriver.Chrome, case: TestCase) -> str:
     if not cached_page_text:
         cached_page_text = body_text(driver)
 
-    # Structural Validation Helper
-    def assert_page_rendered(text: str):
+    # Structural Validation Helper combined with Exact Assertion
+    def assert_page_rendered(text: str, allow_404: bool = False):
         assert len(text) > 10, "Page rendered completely blank"
-        assert "404" not in text[:50] and "Not Found" not in text[:50], "Page returned 404 Not Found"
+        if not allow_404:
+            assert "404" not in text[:50] and "Not Found" not in text[:50], "Page returned 404 Not Found"
         assert "Internal Server Error" not in text[:100], "Page returned 500 Server Error"
+
+    def assert_text_present_dynamically(target_text: str, is_unauthorized_check: bool = False):
+        if not target_text or target_text == "None": return
+        if is_unauthorized_check and target_text == "Passed":
+            # For unauthorized checks, "Passed" just means we verified it returned 404 or unauthorized
+            text = body_text(driver)
+            assert "404" in text[:50] or "Not Found" in text[:50] or "Unauthorized" in text, "Expected page to be inaccessible"
+            return
+        try:
+            # Dynamically wait for the specific text to appear
+            if target_text == "Sign In":
+                WebDriverWait(driver, 8).until(lambda d: "Sign In" in body_text(d) or "Login" in body_text(d))
+            else:
+                WebDriverWait(driver, 8).until(lambda d: target_text in body_text(d))
+        except TimeoutException:
+            pass # We let the exact assertion below catch the failure for the report
+        
+        # Strict Assertion is restored
+        text = body_text(driver)
+        if target_text == "Sign In":
+            assert "Sign In" in text or "Login" in text, "Expected 'Sign In' or 'Login' in page text"
+        else:
+            assert target_text in text, f"Expected '{target_text}' in page text"
 
     # Execution logic
     if kind == "body_contains":
         assert_page_rendered(cached_page_text)
-        return cached_page_text
+        assert_text_present_dynamically(expected_text)
+        return body_text(driver)
 
     elif kind == "login_checks":
         if case.params.get("check") == "body":
             assert_page_rendered(cached_page_text)
-            return cached_page_text
+            assert_text_present_dynamically(expected_text)
+            return body_text(driver)
         current_route = None
         cached_page_text = ""
         text = submit_login_flow(driver, "CITIZEN")
         assert_page_rendered(text)
+        assert expected_text in text, f"Expected '{expected_text}' in page text"
         return text
 
     elif kind == "signup_checks":
         if case.params.get("check") == "body":
             assert_page_rendered(cached_page_text)
-            return cached_page_text
+            assert_text_present_dynamically(expected_text)
+            return body_text(driver)
         current_route = None
         cached_page_text = ""
         text = submit_signup_flow(driver)
         assert_page_rendered(text)
+        assert expected_text in text, f"Expected '{expected_text}' in page text"
         return text
 
     elif kind == "dashboard_text":
         assert_page_rendered(cached_page_text)
-        return cached_page_text
+        assert_text_present_dynamically(expected_text)
+        return body_text(driver)
 
     elif kind == "complaint_text":
         if case.params.get("check") == "flow":
@@ -489,9 +504,9 @@ def execute_case(driver: webdriver.Chrome, case: TestCase) -> str:
             cached_page_text = ""
             text = submit_complaint_flow(driver)
             assert_page_rendered(text)
+            assert expected_text in text, f"Expected '{expected_text}' in page text"
             return text
             
-        # We navigate and just assert it rendered successfully without strictly matching text
         if "Complaint Details" in expected_text:
             open_route(driver, "/complaints/e2e-complaint-1")
             current_route = "/complaints/e2e-complaint-1"
@@ -502,9 +517,9 @@ def execute_case(driver: webdriver.Chrome, case: TestCase) -> str:
             open_route(driver, "/complaints/create")
             current_route = "/complaints/create"
             
-        cached_page_text = body_text(driver)
-        assert_page_rendered(cached_page_text)
-        return cached_page_text
+        assert_page_rendered(body_text(driver))
+        assert_text_present_dynamically(expected_text)
+        return body_text(driver)
 
     elif kind == "inspector_text":
         if case.params.get("check") == "flow":
@@ -515,15 +530,16 @@ def execute_case(driver: webdriver.Chrome, case: TestCase) -> str:
             elif "Resolve" in expected_text: action = "resolve"
             text = submit_inspector_action(driver, action)
             assert_page_rendered(text)
+            assert expected_text in text, f"Expected '{expected_text}' in page text"
             return text
             
         if "Complaint Details" in expected_text:
             open_route(driver, "/complaints/e2e-complaint-2")
             current_route = "/complaints/e2e-complaint-2"
-            cached_page_text = body_text(driver)
             
-        assert_page_rendered(cached_page_text)
-        return cached_page_text
+        assert_page_rendered(body_text(driver))
+        assert_text_present_dynamically(expected_text)
+        return body_text(driver)
 
     elif kind == "worker_text":
         if "Complaint Details" in expected_text:
@@ -533,39 +549,45 @@ def execute_case(driver: webdriver.Chrome, case: TestCase) -> str:
             open_route(driver, "/complaints/e2e-complaint-2/track")
             current_route = "/complaints/e2e-complaint-2/track"
             
-        cached_page_text = body_text(driver)
-        assert_page_rendered(cached_page_text)
-        return cached_page_text
+        assert_page_rendered(body_text(driver))
+        assert_text_present_dynamically(expected_text)
+        return body_text(driver)
 
     elif kind in ["admin_text", "profile_text", "validation_text", "security_check"]:
-        assert_page_rendered(cached_page_text)
-        return cached_page_text
+        is_unauthorized = "cannot access" in case.name.lower()
+        assert_page_rendered(cached_page_text, allow_404=is_unauthorized)
+        if kind != "security_check":
+            assert_text_present_dynamically(expected_text, is_unauthorized_check=is_unauthorized)
+        return body_text(driver)
 
     elif kind == "workflow":
         if case.params.get("check") == "login_flow":
             current_route = None
             text = submit_login_flow(driver, "CITIZEN")
             assert_page_rendered(text)
+            assert expected_text in text, f"Expected '{expected_text}' in page text"
             return text
         elif case.params.get("check") == "signup_flow":
             current_route = None
             text = submit_signup_flow(driver)
             assert_page_rendered(text)
+            assert expected_text in text, f"Expected '{expected_text}' in page text"
             return text
         elif case.params.get("check") == "complaint_flow":
             current_route = None
             text = submit_complaint_flow(driver)
             assert_page_rendered(text)
+            assert expected_text in text, f"Expected '{expected_text}' in page text"
             return text
         elif case.params.get("check") == "inspector_flow":
             current_route = None
             action = str(case.params.get("action", "start"))
             text = submit_inspector_action(driver, action)
             assert_page_rendered(text)
+            assert expected_text in text, f"Expected '{expected_text}' in page text"
             return text
         elif case.params.get("check") == "logout_flow":
             current_route = None
-            # Assuming Logout button is present, we wrap it loosely
             try:
                 click_button_with_text(driver, "Logout")
                 handle_alert_if_present(driver)
@@ -575,13 +597,16 @@ def execute_case(driver: webdriver.Chrome, case: TestCase) -> str:
             wait_ready(driver)
             text = body_text(driver)
             assert_page_rendered(text)
+            assert expected_text in text, f"Expected '{expected_text}' in page text"
             return text
 
         assert_page_rendered(cached_page_text)
-        return cached_page_text
+        assert_text_present_dynamically(expected_text)
+        return body_text(driver)
 
     assert_page_rendered(cached_page_text)
-    return cached_page_text
+    assert_text_present_dynamically(expected_text)
+    return body_text(driver)
 
 def build_workbook(summary_rows, passed_rows, failed_rows, log_rows, detail_rows):
     wb = Workbook()

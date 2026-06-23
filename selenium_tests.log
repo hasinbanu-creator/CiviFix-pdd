@@ -1,0 +1,167 @@
+2026-06-23 17:53:03,407 - WDM - INFO - ====== WebDriver manager ======
+2026-06-23 17:53:09,897 - WDM - INFO - Driver [C:\Users\HASIN\.wdm\drivers\chromedriver\win64\149.0.7827.155\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-06-23 17:53:12,779 - conftest - INFO - WebDriver initialized - chrome
+2026-06-23 17:53:16,169 - base_page - INFO - Navigated to: http://localhost:3000/login
+2026-06-23 17:53:18,183 - base_page - INFO - Typed text in: ('id', 'email-input')
+2026-06-23 17:53:19,825 - base_page - INFO - Clicked element: ('xpath', "//button[contains(translate(normalize-space(.), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'CONTINUE')]")
+2026-06-23 17:53:40,893 - base_page - ERROR - Wait for visibility failed: ('xpath', "//input[@inputmode='numeric' and @maxlength='1']") - Message: 
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7ff7528c3fa5+14925]
+	chromedriver!GetHandleVerifier [0x7ff7528c4000+14980]
+	chromedriver!(No symbol) [0x7ff75240793d]
+	chromedriver!(No symbol) [0x7ff752461aad]
+	chromedriver!(No symbol) [0x7ff752461dac]
+	chromedriver!(No symbol) [0x7ff7524b27d7]
+	chromedriver!(No symbol) [0x7ff7524af39b]
+	chromedriver!(No symbol) [0x7ff75245401c]
+	chromedriver!(No symbol) [0x7ff752454f43]
+	chromedriver!GetHandleVerifier [0x7ff752ea7591+5f7f11]
+	chromedriver!GetHandleVerifier [0x7ff752ea1902+5f2282]
+	chromedriver!GetHandleVerifier [0x7ff752ec7115+617a95]
+	chromedriver!GetHandleVerifier [0x7ff7528e1dce+3274e]
+	chromedriver!GetHandleVerifier [0x7ff7528ea82c+3b1ac]
+	chromedriver!GetHandleVerifier [0x7ff7528cd744+1e0c4]
+	chromedriver!GetHandleVerifier [0x7ff7528cd8d4+1e254]
+	chromedriver!GetHandleVerifier [0x7ff7528b1447+1dc7]
+	KERNEL32!BaseThreadInitThunk [0x7ffd4961257d+1d]
+	ntdll!RtlUserThreadStart [0x7ffd4a4eaf08+28]
+
+2026-06-23 17:53:40,893 - test_scenarios - ERROR - Login test failed: Message: 
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7ff7528c3fa5+14925]
+	chromedriver!GetHandleVerifier [0x7ff7528c4000+14980]
+	chromedriver!(No symbol) [0x7ff75240793d]
+	chromedriver!(No symbol) [0x7ff752461aad]
+	chromedriver!(No symbol) [0x7ff752461dac]
+	chromedriver!(No symbol) [0x7ff7524b27d7]
+	chromedriver!(No symbol) [0x7ff7524af39b]
+	chromedriver!(No symbol) [0x7ff75245401c]
+	chromedriver!(No symbol) [0x7ff752454f43]
+	chromedriver!GetHandleVerifier [0x7ff752ea7591+5f7f11]
+	chromedriver!GetHandleVerifier [0x7ff752ea1902+5f2282]
+	chromedriver!GetHandleVerifier [0x7ff752ec7115+617a95]
+	chromedriver!GetHandleVerifier [0x7ff7528e1dce+3274e]
+	chromedriver!GetHandleVerifier [0x7ff7528ea82c+3b1ac]
+	chromedriver!GetHandleVerifier [0x7ff7528cd744+1e0c4]
+	chromedriver!GetHandleVerifier [0x7ff7528cd8d4+1e254]
+	chromedriver!GetHandleVerifier [0x7ff7528b1447+1dc7]
+	KERNEL32!BaseThreadInitThunk [0x7ffd4961257d+1d]
+	ntdll!RtlUserThreadStart [0x7ffd4a4eaf08+28]
+
+2026-06-23 17:53:43,678 - conftest - INFO - WebDriver closed
+2026-06-23 17:53:43,682 - WDM - INFO - ====== WebDriver manager ======
+2026-06-23 17:53:46,967 - WDM - INFO - Driver [C:\Users\HASIN\.wdm\drivers\chromedriver\win64\149.0.7827.155\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-06-23 17:53:49,035 - conftest - INFO - WebDriver initialized - chrome
+2026-06-23 17:53:51,576 - base_page - INFO - Navigated to: http://localhost:3000/login
+2026-06-23 17:53:52,387 - base_page - INFO - Typed text in: ('id', 'email-input')
+2026-06-23 17:53:53,062 - base_page - INFO - Clicked element: ('xpath', "//button[contains(translate(normalize-space(.), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'CONTINUE')]")
+2026-06-23 17:53:53,496 - base_page - INFO - Screenshot saved: ./screenshots\test_login_blank_PASS.png
+2026-06-23 17:53:56,413 - conftest - INFO - WebDriver closed
+2026-06-23 17:53:56,415 - WDM - INFO - ====== WebDriver manager ======
+2026-06-23 17:54:00,615 - WDM - INFO - Driver [C:\Users\HASIN\.wdm\drivers\chromedriver\win64\149.0.7827.155\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-06-23 17:54:02,962 - conftest - INFO - WebDriver initialized - chrome
+2026-06-23 17:54:06,632 - base_page - INFO - Navigated to: http://localhost:3000/login
+2026-06-23 17:54:09,772 - base_page - INFO - Typed text in: ('id', 'email-input')
+2026-06-23 17:54:11,193 - base_page - INFO - Clicked element: ('xpath', "//button[contains(translate(normalize-space(.), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'CONTINUE')]")
+2026-06-23 17:54:22,044 - base_page - INFO - Screenshot saved: ./screenshots\test_login_invalid-email_FAIL.png
+2026-06-23 17:54:29,061 - conftest - INFO - WebDriver closed
+2026-06-23 17:54:29,061 - WDM - INFO - ====== WebDriver manager ======
+2026-06-23 17:54:33,686 - WDM - INFO - Driver [C:\Users\HASIN\.wdm\drivers\chromedriver\win64\149.0.7827.155\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-06-23 17:54:36,039 - conftest - INFO - WebDriver initialized - chrome
+2026-06-23 17:54:38,582 - base_page - INFO - Navigated to: http://localhost:3000/signup
+2026-06-23 17:54:39,387 - base_page - INFO - Typed text in: ('id', 'signup-name')
+2026-06-23 17:54:41,243 - base_page - INFO - Typed text in: ('id', 'signup-email')
+2026-06-23 17:54:43,093 - base_page - INFO - Typed text in: ('id', 'signup-mobile')
+2026-06-23 17:54:43,834 - base_page - INFO - Clicked element: ('xpath', "//button[contains(translate(normalize-space(.), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'NEXT')]")
+2026-06-23 17:54:44,938 - base_page - INFO - Typed text in: ('xpath', "//textarea[@placeholder='House / Street / Locality']")
+2026-06-23 17:54:45,345 - test_scenarios - ERROR - Signup test failed: Message: javascript error: missing ) after argument list
+  (Session info: chrome=149.0.7827.104)
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7ff7528c3fa5+14925]
+	chromedriver!GetHandleVerifier [0x7ff7528c4000+14980]
+	chromedriver!(No symbol) [0x7ff75240793d]
+	chromedriver!(No symbol) [0x7ff75240f8b1]
+	chromedriver!(No symbol) [0x7ff752412c0f]
+	chromedriver!(No symbol) [0x7ff7524b0748]
+	chromedriver!(No symbol) [0x7ff75248a3ca]
+	chromedriver!(No symbol) [0x7ff7524af39b]
+	chromedriver!(No symbol) [0x7ff75245401c]
+	chromedriver!(No symbol) [0x7ff752454f43]
+	chromedriver!GetHandleVerifier [0x7ff752ea7591+5f7f11]
+	chromedriver!GetHandleVerifier [0x7ff752ea1902+5f2282]
+	chromedriver!GetHandleVerifier [0x7ff752ec7115+617a95]
+	chromedriver!GetHandleVerifier [0x7ff7528e1dce+3274e]
+	chromedriver!GetHandleVerifier [0x7ff7528ea82c+3b1ac]
+	chromedriver!GetHandleVerifier [0x7ff7528cd744+1e0c4]
+	chromedriver!GetHandleVerifier [0x7ff7528cd8d4+1e254]
+	chromedriver!GetHandleVerifier [0x7ff7528b1447+1dc7]
+	KERNEL32!BaseThreadInitThunk [0x7ffd4961257d+1d]
+	ntdll!RtlUserThreadStart [0x7ffd4a4eaf08+28]
+
+2026-06-23 17:54:48,030 - conftest - INFO - WebDriver closed
+2026-06-23 17:54:48,030 - WDM - INFO - ====== WebDriver manager ======
+2026-06-23 17:54:52,017 - WDM - INFO - Driver [C:\Users\HASIN\.wdm\drivers\chromedriver\win64\149.0.7827.155\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-06-23 17:54:55,433 - conftest - INFO - WebDriver initialized - chrome
+2026-06-23 17:54:58,945 - base_page - INFO - Navigated to: http://localhost:3000/login
+2026-06-23 17:55:00,689 - base_page - INFO - Typed text in: ('id', 'email-input')
+2026-06-23 17:55:02,379 - base_page - INFO - Clicked element: ('xpath', "//button[contains(translate(normalize-space(.), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'CONTINUE')]")
+2026-06-23 17:55:28,117 - conftest - INFO - WebDriver closed
+2026-06-23 17:55:28,117 - WDM - INFO - ====== WebDriver manager ======
+2026-06-23 17:55:32,772 - WDM - INFO - Driver [C:\Users\HASIN\.wdm\drivers\chromedriver\win64\149.0.7827.155\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-06-23 17:55:35,737 - conftest - INFO - WebDriver initialized - chrome
+2026-06-23 17:55:38,343 - base_page - INFO - Navigated to: http://localhost:3000/login
+2026-06-23 17:55:40,354 - base_page - INFO - Typed text in: ('id', 'email-input')
+2026-06-23 17:55:41,110 - base_page - INFO - Clicked element: ('xpath', "//button[contains(translate(normalize-space(.), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'CONTINUE')]")
+2026-06-23 17:56:01,864 - test_scenarios - ERROR - Dashboard test failed: Message: 
+
+2026-06-23 17:56:13,998 - conftest - INFO - WebDriver closed
+2026-06-23 17:56:14,005 - WDM - INFO - ====== WebDriver manager ======
+2026-06-23 17:56:19,609 - WDM - INFO - Driver [C:\Users\HASIN\.wdm\drivers\chromedriver\win64\149.0.7827.155\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-06-23 17:56:23,933 - conftest - INFO - WebDriver initialized - chrome
+2026-06-23 17:56:29,460 - base_page - INFO - Navigated to: http://localhost:3000/login
+2026-06-23 17:56:31,296 - base_page - INFO - Typed text in: ('id', 'email-input')
+2026-06-23 17:56:33,177 - base_page - INFO - Clicked element: ('xpath', "//button[contains(translate(normalize-space(.), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'CONTINUE')]")
+2026-06-23 17:57:00,112 - conftest - INFO - WebDriver closed
+2026-06-23 17:57:00,115 - WDM - INFO - ====== WebDriver manager ======
+2026-06-23 17:57:05,043 - WDM - INFO - Driver [C:\Users\HASIN\.wdm\drivers\chromedriver\win64\149.0.7827.155\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-06-23 17:57:08,429 - conftest - INFO - WebDriver initialized - chrome
+2026-06-23 17:57:11,505 - base_page - INFO - Navigated to: http://localhost:3000/login
+2026-06-23 17:57:12,618 - base_page - INFO - Typed text in: ('id', 'email-input')
+2026-06-23 17:57:13,215 - base_page - INFO - Clicked element: ('xpath', "//button[contains(translate(normalize-space(.), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'CONTINUE')]")
+2026-06-23 17:57:38,502 - conftest - INFO - WebDriver closed
+2026-06-23 17:57:38,502 - WDM - INFO - ====== WebDriver manager ======
+2026-06-23 17:57:44,852 - WDM - INFO - Driver [C:\Users\HASIN\.wdm\drivers\chromedriver\win64\149.0.7827.155\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-06-23 17:57:47,457 - conftest - INFO - WebDriver initialized - chrome
+2026-06-23 17:57:53,122 - base_page - INFO - Navigated to: http://localhost:3000/login
+2026-06-23 17:57:54,636 - base_page - INFO - Typed text in: ('id', 'email-input')
+2026-06-23 17:57:55,014 - base_page - INFO - Clicked element: ('xpath', "//button[contains(translate(normalize-space(.), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'CONTINUE')]")
+2026-06-23 17:58:49,004 - conftest - INFO - WebDriver closed
+2026-06-23 17:58:49,011 - WDM - INFO - ====== WebDriver manager ======
+2026-06-23 17:59:05,391 - WDM - INFO - Driver [C:\Users\HASIN\.wdm\drivers\chromedriver\win64\149.0.7827.155\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-06-23 17:59:11,970 - conftest - INFO - WebDriver initialized - chrome
+2026-06-23 17:59:16,468 - base_page - INFO - Navigated to: http://localhost:3000/login
+2026-06-23 17:59:17,940 - base_page - INFO - Typed text in: ('id', 'email-input')
+2026-06-23 17:59:18,472 - base_page - INFO - Clicked element: ('xpath', "//button[contains(translate(normalize-space(.), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'CONTINUE')]")
+2026-06-23 17:59:51,382 - conftest - INFO - WebDriver closed
+2026-06-23 17:59:51,382 - WDM - INFO - ====== WebDriver manager ======
+2026-06-23 17:59:51,807 - WDM - INFO - ====== WebDriver manager ======
+2026-06-23 17:59:59,614 - WDM - INFO - Driver [C:\Users\HASIN\.wdm\drivers\chromedriver\win64\149.0.7827.155\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-06-23 18:00:05,291 - conftest - INFO - WebDriver initialized - chrome
+2026-06-23 18:00:27,636 - WDM - INFO - Driver [C:\Users\HASIN\.wdm\drivers\chromedriver\win64\149.0.7827.155\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-06-23 18:00:33,668 - conftest - INFO - WebDriver initialized - chrome
+2026-06-23 18:00:37,894 - base_page - INFO - Navigated to: http://localhost:3000/login
+2026-06-23 18:00:38,945 - base_page - INFO - Typed text in: ('id', 'email-input')
+2026-06-23 18:00:39,891 - base_page - INFO - Clicked element: ('xpath', "//button[contains(translate(normalize-space(.), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'CONTINUE')]")
+2026-06-23 18:01:30,543 - conftest - INFO - WebDriver closed
+2026-06-23 18:01:30,561 - WDM - INFO - ====== WebDriver manager ======
+2026-06-23 18:01:40,827 - WDM - INFO - Driver [C:\Users\HASIN\.wdm\drivers\chromedriver\win64\149.0.7827.155\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-06-23 18:01:46,449 - conftest - INFO - WebDriver initialized - chrome
+2026-06-23 18:02:11,620 - WDM - INFO - ====== WebDriver manager ======
+2026-06-23 18:02:12,419 - conftest - INFO - WebDriver closed
+2026-06-23 18:02:36,422 - WDM - INFO - Driver [C:\Users\HASIN\.wdm\drivers\chromedriver\win64\149.0.7827.155\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-06-23 18:02:46,005 - conftest - INFO - WebDriver initialized - chrome
+2026-06-23 18:02:51,383 - base_page - INFO - Navigated to: http://localhost:3000/login
+2026-06-23 18:02:52,725 - base_page - INFO - Typed text in: ('id', 'email-input')
+2026-06-23 18:02:53,292 - base_page - INFO - Clicked element: ('xpath', "//button[contains(translate(normalize-space(.), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'CONTINUE')]")
+2026-06-23 18:03:14,190 - conftest - INFO - WebDriver closed
+2026-06-23 18:03:40,176 - conftest - INFO - WebDriver closed

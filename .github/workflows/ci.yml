@@ -97,7 +97,7 @@ jobs:
       # Step 11: Verify the Vulnerability report exists, print its absolute path, and fail if missing
       - name: Verify and Log Vulnerability Report File
         run: |
-          VULN_PATH="Vulnerability Test Results/vulnerability_report.xlsx"
+          VULN_PATH="test_results/vulnerability_report.xlsx"
           if [ -f "$VULN_PATH" ]; then
             echo "Verification Successful: Vulnerability report was generated successfully."
             echo "Absolute Path of Vulnerability Report: $(realpath "$VULN_PATH")"
@@ -118,4 +118,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vulnerability-report
-          path: Vulnerability Test Results/vulnerability_report.xlsx
+          path: test_results/vulnerability_report.xlsx
