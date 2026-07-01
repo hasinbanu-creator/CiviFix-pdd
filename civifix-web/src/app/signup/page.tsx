@@ -17,7 +17,6 @@ import {
   AlertCircle
 } from "lucide-react";
 
-const PRIMARY = "bg-blue-600";
 const OTP_LENGTH = 6;
 
 export default function SignupPage() {
@@ -219,44 +218,44 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-background flex flex-col md:flex-row">
       {/* ── LEFT/HEADER SECTION ── */}
-      <div className={`${PRIMARY} flex flex-col justify-center px-6 py-12 md:p-12 lg:p-16 md:w-5/12 lg:w-4/12 relative overflow-hidden z-10`}>
+      <div className={`bg-primary flex flex-col justify-center px-6 py-12 md:p-12 lg:p-16 md:w-5/12 lg:w-4/12 relative overflow-hidden z-10`}>
         <div className="absolute -top-32 -left-32 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-32 -right-32 w-80 h-80 bg-black/10 rounded-full blur-3xl"></div>
         
         <div className="relative z-10">
-          <div className="w-14 h-14 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-10 shadow-lg border border-white/20">
-            <img src="/logo.png" alt="CiviFix" className="w-8 h-8 object-cover" />
+          <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-10 shadow-lg border border-white/20">
+            <img src="/logo.png" alt="CiviFix" className="w-10 h-10 object-contain" />
           </div>
           
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-[1.1] mb-6 tracking-tight">
             Create <br />
-            <span className="text-blue-200">Account</span>
+            <span className="text-white/80">Account</span>
           </h1>
-          <p className="text-blue-100 text-sm md:text-base leading-relaxed font-medium max-w-sm">
+          <p className="text-white/80 text-sm md:text-base leading-relaxed font-medium max-w-sm">
             Join CiviFix today to report issues, track resolutions, and coordinate with municipal officers.
           </p>
         </div>
       </div>
 
       {/* ── RIGHT/FORM SECTION ── */}
-      <div className="flex-1 bg-white flex flex-col px-6 py-8 md:p-12 lg:p-16 rounded-t-3xl md:rounded-t-none -mt-6 md:mt-0 z-20 overflow-y-auto">
-        <div className="flex-1 max-w-xl mx-auto w-full">
+      <div className="flex-1 bg-card flex flex-col px-6 py-8 md:p-12 lg:p-16 rounded-t-[40px] md:rounded-t-none -mt-8 md:mt-0 z-20 overflow-y-auto shadow-[-10px_0_30px_-15px_rgba(0,0,0,0.1)]">
+        <div className="flex-1 max-w-xl mx-auto w-full pt-4">
           
           {step !== "OTP" && (
             <div className="flex items-center gap-4 mb-8">
               <button 
                 onClick={() => step === 1 ? router.push("/login") : setStep(1)}
-                className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors"
+                className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
               >
-                <ArrowLeft className="w-5 h-5 text-slate-600" />
+                <ArrowLeft className="w-5 h-5 text-muted-foreground" />
               </button>
               <div className="flex-1">
-                <h2 className="text-xl font-bold text-slate-800">
-                  {step === 1 ? "Personal Info" : "Security Info"}
+                <h2 className="text-xl font-bold text-foreground">
+                  {step === 1 ? "Personal Info" : "Location Info"}
                 </h2>
-                <p className="text-xs font-semibold text-slate-400">Step {step} of 2</p>
+                <p className="text-xs font-semibold text-muted-foreground">Step {step} of 2</p>
               </div>
             </div>
           )}
@@ -265,24 +264,24 @@ export default function SignupPage() {
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="signup-name" className="block text-xs font-bold text-slate-500 tracking-wider mb-2">FULL NAME</label>
-                  <div className={`flex items-center gap-3 border-2 rounded-xl px-4 py-3 bg-slate-50 ${errors.name ? 'border-red-500' : 'border-slate-100 focus-within:border-blue-500'}`}>
-                    <User className="w-5 h-5 text-slate-400" />
+                  <label htmlFor="signup-name" className="block text-xs font-bold text-muted-foreground tracking-wider mb-2">FULL NAME</label>
+                  <div className={`flex items-center gap-3 border-2 rounded-2xl px-5 py-3.5 bg-muted/30 transition-all duration-200 ${errors.name ? 'border-destructive bg-destructive/5' : 'border-border focus-within:border-primary focus-within:bg-card focus-within:ring-4 focus-within:ring-primary/10'}`}>
+                    <User className="w-5 h-5 text-muted-foreground" />
                     <input
                       id="signup-name"
                       type="text"
                       value={formData.name}
                       onChange={(e) => updateField("name", e.target.value)}
                       placeholder="Enter full name"
-                      className="flex-1 bg-transparent border-none outline-none text-slate-800 text-sm"
+                      className="flex-1 bg-transparent border-none outline-none text-foreground text-sm font-medium"
                     />
                   </div>
-                  {errors.name && <p className="text-red-500 text-xs mt-1 font-medium">{errors.name}</p>}
+                  {errors.name && <p className="text-destructive text-xs mt-1.5 ml-1 font-bold">{errors.name}</p>}
                 </div>
                 <div>
-                  <label htmlFor="signup-mobile" className="block text-xs font-bold text-slate-500 tracking-wider mb-2">MOBILE NUMBER</label>
-                  <div className={`flex items-center gap-3 border-2 rounded-xl px-4 py-3 bg-slate-50 ${errors.mobile_number ? 'border-red-500' : 'border-slate-100 focus-within:border-blue-500'}`}>
-                    <span className="text-slate-800 font-bold text-sm pr-2 border-r-2 border-slate-200">🇮🇳 +91</span>
+                  <label htmlFor="signup-mobile" className="block text-xs font-bold text-muted-foreground tracking-wider mb-2">MOBILE NUMBER</label>
+                  <div className={`flex items-center gap-3 border-2 rounded-2xl px-5 py-3.5 bg-muted/30 transition-all duration-200 ${errors.mobile_number ? 'border-destructive bg-destructive/5' : 'border-border focus-within:border-primary focus-within:bg-card focus-within:ring-4 focus-within:ring-primary/10'}`}>
+                    <span className="text-foreground font-bold text-sm pr-2 border-r-2 border-border">🇮🇳 +91</span>
                     <input
                       id="signup-mobile"
                       type="tel"
@@ -290,17 +289,17 @@ export default function SignupPage() {
                       onChange={(e) => updateField("mobile_number", e.target.value)}
                       placeholder="10-digit number"
                       maxLength={10}
-                      className="flex-1 bg-transparent border-none outline-none text-slate-800 text-sm"
+                      className="flex-1 bg-transparent border-none outline-none text-foreground text-sm font-medium"
                     />
                   </div>
-                  {errors.mobile_number && <p className="text-red-500 text-xs mt-1 font-medium">{errors.mobile_number}</p>}
+                  {errors.mobile_number && <p className="text-destructive text-xs mt-1.5 ml-1 font-bold">{errors.mobile_number}</p>}
                 </div>
               </div>
 
               <div>
-                <label htmlFor="signup-email" className="block text-xs font-bold text-slate-500 tracking-wider mb-2">EMAIL ADDRESS</label>
-                <div className={`flex items-center gap-3 border-2 rounded-xl px-4 py-3 bg-slate-50 ${errors.email ? 'border-red-500' : 'border-slate-100 focus-within:border-blue-500'}`}>
-                  <Mail className="w-5 h-5 text-slate-400" />
+                <label htmlFor="signup-email" className="block text-xs font-bold text-muted-foreground tracking-wider mb-2">EMAIL ADDRESS</label>
+                <div className={`flex items-center gap-3 border-2 rounded-2xl px-5 py-3.5 bg-muted/30 transition-all duration-200 ${errors.email ? 'border-destructive bg-destructive/5' : 'border-border focus-within:border-primary focus-within:bg-card focus-within:ring-4 focus-within:ring-primary/10'}`}>
+                  <Mail className="w-5 h-5 text-muted-foreground" />
                   <input
                     id="signup-email"
                     type="email"
@@ -308,10 +307,10 @@ export default function SignupPage() {
                     onChange={(e) => updateField("email", e.target.value)}
                     placeholder="Enter email address"
                     autoCapitalize="none"
-                    className="flex-1 bg-transparent border-none outline-none text-slate-800 text-sm"
+                    className="flex-1 bg-transparent border-none outline-none text-foreground text-sm font-medium"
                   />
                 </div>
-                {errors.email && <p className="text-red-500 text-xs mt-1 font-medium">{errors.email}</p>}
+                {errors.email && <p className="text-destructive text-xs mt-1.5 ml-1 font-bold">{errors.email}</p>}
               </div>
 
 
@@ -319,10 +318,10 @@ export default function SignupPage() {
               <div className="pt-4">
                 <button
                   onClick={handleNextStep}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm py-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-blue-500/25"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm py-4 rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-md shadow-primary/20"
                 >
                   <span className="tracking-widest">NEXT</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-5 h-5" />
                 </button>
               </div>
             </div>
@@ -332,32 +331,32 @@ export default function SignupPage() {
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-xs font-bold text-slate-500 tracking-wider">ADDRESS</label>
-                  <button onClick={handleGetLocation} className="text-xs font-bold text-blue-600 flex items-center gap-1 hover:text-blue-700">
+                  <label className="block text-xs font-bold text-muted-foreground tracking-wider">ADDRESS</label>
+                  <button onClick={handleGetLocation} className="text-xs font-bold text-primary flex items-center gap-1 hover:text-primary/80 transition-colors">
                     <MapPin className="w-3 h-3" />
                     {gpsLoading ? "Loading..." : "Use Current Location"}
                   </button>
                 </div>
-                <div className={`border-2 rounded-xl px-4 py-3 bg-slate-50 ${errors.address ? 'border-red-500' : 'border-slate-100 focus-within:border-blue-500'}`}>
+                <div className={`border-2 rounded-2xl px-5 py-3.5 bg-muted/30 transition-all duration-200 ${errors.address ? 'border-destructive bg-destructive/5' : 'border-border focus-within:border-primary focus-within:bg-card focus-within:ring-4 focus-within:ring-primary/10'}`}>
                   <textarea
                     value={formData.address}
                     onChange={(e) => updateField("address", e.target.value)}
                     placeholder="House / Street / Locality"
                     rows={2}
-                    className="w-full bg-transparent border-none outline-none text-slate-800 text-sm resize-none"
+                    className="w-full bg-transparent border-none outline-none text-foreground text-sm font-medium resize-none"
                   />
                 </div>
-                {errors.address && <p className="text-red-500 text-xs mt-1 font-medium">{errors.address}</p>}
+                {errors.address && <p className="text-destructive text-xs mt-1.5 ml-1 font-bold">{errors.address}</p>}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 tracking-wider mb-2">DISTRICT</label>
-                  <div className={`border-2 rounded-xl px-4 py-3 bg-slate-50 ${errors.district_id ? 'border-red-500' : 'border-slate-100 focus-within:border-blue-500'}`}>
+                  <label className="block text-xs font-bold text-muted-foreground tracking-wider mb-2">DISTRICT</label>
+                  <div className={`border-2 rounded-2xl px-5 py-3.5 bg-muted/30 transition-all duration-200 ${errors.district_id ? 'border-destructive bg-destructive/5' : 'border-border focus-within:border-primary focus-within:bg-card focus-within:ring-4 focus-within:ring-primary/10'}`}>
                     <select
                       value={formData.district_id}
                       onChange={(e) => updateField("district_id", e.target.value)}
-                      className="w-full bg-transparent border-none outline-none text-slate-800 text-sm appearance-none"
+                      className="w-full bg-transparent border-none outline-none text-foreground text-sm font-medium appearance-none"
                     >
                       <option value="">Select District</option>
                       {districts.map(d => (
@@ -365,15 +364,15 @@ export default function SignupPage() {
                       ))}
                     </select>
                   </div>
-                  {errors.district_id && <p className="text-red-500 text-xs mt-1 font-medium">{errors.district_id}</p>}
+                  {errors.district_id && <p className="text-destructive text-xs mt-1.5 ml-1 font-bold">{errors.district_id}</p>}
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 tracking-wider mb-2">WARD</label>
-                  <div className={`border-2 rounded-xl px-4 py-3 bg-slate-50 ${errors.ward_id ? 'border-red-500' : 'border-slate-100 focus-within:border-blue-500'}`}>
+                  <label className="block text-xs font-bold text-muted-foreground tracking-wider mb-2">WARD</label>
+                  <div className={`border-2 rounded-2xl px-5 py-3.5 bg-muted/30 transition-all duration-200 ${errors.ward_id ? 'border-destructive bg-destructive/5' : 'border-border focus-within:border-primary focus-within:bg-card focus-within:ring-4 focus-within:ring-primary/10'}`}>
                     <select
                       value={formData.ward_id}
                       onChange={(e) => updateField("ward_id", e.target.value)}
-                      className="w-full bg-transparent border-none outline-none text-slate-800 text-sm appearance-none"
+                      className="w-full bg-transparent border-none outline-none text-foreground text-sm font-medium appearance-none"
                       disabled={!formData.district_id || loadingWards}
                     >
                       <option value="">{loadingWards ? "Loading..." : "Select Ward"}</option>
@@ -382,7 +381,7 @@ export default function SignupPage() {
                       ))}
                     </select>
                   </div>
-                  {errors.ward_id && <p className="text-red-500 text-xs mt-1 font-medium">{errors.ward_id}</p>}
+                  {errors.ward_id && <p className="text-destructive text-xs mt-1.5 ml-1 font-bold">{errors.ward_id}</p>}
                 </div>
               </div>
 
@@ -393,20 +392,20 @@ export default function SignupPage() {
                     setAgreedToTerms(!agreedToTerms);
                     if (errors.terms) updateField("terms", "");
                   }}
-                  className={`w-5 h-5 rounded flex-shrink-0 flex items-center justify-center mt-0.5 border-2 transition-colors ${agreedToTerms ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-300'}`}
+                  className={`w-6 h-6 rounded flex-shrink-0 flex items-center justify-center mt-0.5 border-2 transition-colors ${agreedToTerms ? 'bg-primary border-primary' : 'bg-card border-border'}`}
                 >
-                  {agreedToTerms && <CheckCircle2 className="w-3 h-3 text-white" />}
+                  {agreedToTerms && <CheckCircle2 className="w-4 h-4 text-primary-foreground" />}
                 </button>
-                <p className="text-sm text-slate-600 font-medium leading-tight">
-                  I agree to the <span className="text-blue-600 font-bold">Terms & Conditions</span> and <span className="text-blue-600 font-bold">Privacy Policy</span>
+                <p className="text-sm text-muted-foreground font-medium leading-tight">
+                  I agree to the <span className="text-primary font-bold">Terms & Conditions</span> and <span className="text-primary font-bold">Privacy Policy</span>
                 </p>
               </div>
-              {errors.terms && <p className="text-red-500 text-xs mt-1 font-medium">{errors.terms}</p>}
+              {errors.terms && <p className="text-destructive text-xs mt-1.5 ml-1 font-bold">{errors.terms}</p>}
 
               {authError && (
-                <div className="flex items-center gap-2 p-4 rounded-xl bg-red-50 border border-red-100">
-                  <AlertCircle className="w-5 h-5 text-red-500" />
-                  <p className="text-sm font-medium text-red-600 flex-1">{authError}</p>
+                <div className="flex items-center gap-3 p-4 rounded-2xl bg-destructive/5 border border-destructive/20">
+                  <AlertCircle className="w-5 h-5 text-destructive" />
+                  <p className="text-sm font-bold text-destructive flex-1">{authError}</p>
                 </div>
               )}
 
@@ -414,14 +413,14 @@ export default function SignupPage() {
                 <button
                   onClick={handleRegister}
                   disabled={loading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-70 text-white font-extrabold text-sm py-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-blue-500/25"
+                  className="w-full bg-primary hover:bg-primary/90 disabled:opacity-70 text-primary-foreground font-bold text-sm py-4 rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-md shadow-primary/20"
                 >
                   {loading ? (
                     <span className="tracking-widest">CREATING ACCOUNT...</span>
                   ) : (
                     <>
                       <span className="tracking-widest">CREATE ACCOUNT</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowRight className="w-5 h-5" />
                     </>
                   )}
                 </button>
@@ -431,12 +430,12 @@ export default function SignupPage() {
 
           {step === "OTP" && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-500 flex flex-col items-center justify-center text-center">
-              <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-6">
-                <Mail className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                <Mail className="w-8 h-8 text-primary" />
               </div>
-              <h2 className="text-2xl font-black text-slate-900 mb-2">Check your email</h2>
-              <p className="text-slate-500 font-medium mb-8">
-                We sent a 6-digit verification code to <span className="text-slate-800 font-bold">{formData.email}</span>
+              <h2 className="text-2xl font-black text-foreground mb-2">Check your email</h2>
+              <p className="text-muted-foreground font-semibold mb-8">
+                We sent a 6-digit verification code to <span className="text-foreground font-bold">{formData.email}</span>
               </p>
 
               <div className="flex justify-center gap-2 sm:gap-3 mb-8 w-full max-w-sm">
@@ -450,28 +449,28 @@ export default function SignupPage() {
                     value={digit}
                     onChange={(e) => handleOtpChange(index, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                    className={`w-10 h-12 sm:w-12 sm:h-14 text-center text-xl font-bold rounded-xl border-2 transition-colors outline-none
-                      ${digit ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-slate-200 text-slate-800 bg-white focus:border-blue-400'}
-                      ${otpError ? 'border-red-500 bg-red-50 text-red-500' : ''}
+                    className={`w-10 h-12 sm:w-14 sm:h-16 text-center text-2xl font-black rounded-2xl border-2 transition-all duration-200 outline-none
+                      ${digit ? 'border-primary text-primary bg-primary/5' : 'border-border text-foreground bg-card focus:border-primary focus:ring-4 focus:ring-primary/10'}
+                      ${otpError ? 'border-destructive bg-destructive/5 text-destructive' : ''}
                     `}
                   />
                 ))}
               </div>
 
-              {otpError && <p className="text-red-500 text-sm font-medium mb-6">{otpError}</p>}
-              {authError && <p className="text-red-500 text-sm font-medium mb-6">{authError}</p>}
+              {otpError && <p className="text-destructive text-sm font-bold mb-6">{otpError}</p>}
+              {authError && <p className="text-destructive text-sm font-bold mb-6">{authError}</p>}
 
               <button
                 onClick={handleVerifyOtp}
                 disabled={loading || otp.join("").length !== OTP_LENGTH}
-                className="w-full max-w-sm bg-blue-600 hover:bg-blue-700 disabled:opacity-70 text-white font-extrabold text-sm py-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-blue-500/25 mb-6"
+                className="w-full max-w-sm bg-primary hover:bg-primary/90 disabled:opacity-70 text-primary-foreground font-bold text-sm py-4 rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-md shadow-primary/20 mb-6"
               >
                 {loading ? "VERIFYING..." : "VERIFY ACCOUNT"}
               </button>
 
               <button 
                 onClick={() => setStep(1)}
-                className="text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors"
+                className="text-sm font-bold text-muted-foreground hover:text-foreground transition-colors"
               >
                 Back to Registration
               </button>
@@ -480,10 +479,10 @@ export default function SignupPage() {
 
           {step !== "OTP" && (
             <div className="mt-12 flex items-center justify-center gap-2">
-              <span className="text-sm font-medium text-slate-500">Already have an account?</span>
+              <span className="text-sm font-semibold text-muted-foreground">Already have an account?</span>
               <button
                 onClick={() => router.push("/login")}
-                className="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
+                className="text-sm font-bold text-primary hover:text-primary/80 transition-colors"
               >
                 Sign In
               </button>

@@ -10,7 +10,10 @@ import {
   Image,
   StyleSheet,
   Dimensions,
+  TouchableWithoutFeedback,
+  Keyboard
 } from "react-native";
+import { Button } from "../../components/Button";
 // import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import { AuthContext } from "../../context/AuthContext";
@@ -48,16 +51,18 @@ export const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.flex}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        bounces={false}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.flex}
       >
-        {/* ── HERO SECTION ── */}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* ── HERO SECTION ── */}
         <View style={styles.hero}>
           {/* Decorative circles */}
           <View style={styles.decorCircle1} />
@@ -120,18 +125,13 @@ export const LoginScreen = ({ navigation }) => {
               <Text style={styles.authError}>{authError}</Text>
             ) : null}
 
-            <TouchableOpacity
-              style={[styles.ctaBtn, loading && styles.ctaBtnDisabled]}
+            <Button
+              title="CONTINUE →"
+              loading={loading}
               onPress={handleLogin}
               disabled={loading}
-              activeOpacity={0.85}
-            >
-              {loading ? (
-                <Text style={styles.ctaBtnText}>SENDING OTP…</Text>
-              ) : (
-                <Text style={styles.ctaBtnText}>CONTINUE →</Text>
-              )}
-            </TouchableOpacity>
+              style={{ marginTop: 4, marginBottom: SPACING.lg }}
+            />
 
             <View style={styles.registerRow}>
               <Text style={styles.registerText}>Don't have an account? </Text>
@@ -177,8 +177,9 @@ export const LoginScreen = ({ navigation }) => {
           </View>
 
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 

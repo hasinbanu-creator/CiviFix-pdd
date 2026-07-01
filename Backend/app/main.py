@@ -5,6 +5,8 @@ from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi.staticfiles import StaticFiles
+import os
 
 from app.core.config import settings
 from app.core.exceptions import (
@@ -13,6 +15,7 @@ from app.core.exceptions import (
     duplicate_key_exception_handler,
     CivifixException
 )
+from fastapi import HTTPException
 from app.core.logger import setup_logging
 from app.schemas.common_schema import HealthCheckSchema
 from app.api.v1.auth_routes import router as auth_router
@@ -23,6 +26,9 @@ from app.api.v1.districts_routes import router as districts_router
 from app.api.v1.dashboard_routes import router as dashboard_router
 from app.api.v1.inspector_routes import router as inspector_router
 from app.api.v1.worker_routes import router as worker_router
+from app.api.v1.notification_routes import router as notification_router
+from app.api.v1.upload_routes import router as upload_router
+from app.api.v1.settings_routes import router as settings_router
 from app.db.indexes import create_indexes
 
 # Setup logging
@@ -34,8 +40,8 @@ app = FastAPI(
     title="Civifix API",
     description="Tamil Nadu Complaint Management Platform",
     version="1.0.0",
-    docs_url="/api/docs",
-    redoc_url="/api/redoc"
+    docs_url="/docs",
+    redoc_url="/redoc"
 )
 
 # CORS middleware
@@ -59,8 +65,24 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
 app.add_middleware(SecurityHeadersMiddleware)
 
+# Mount uploads directory
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
 # Exception handlers
 app.add_exception_handler(CivifixException, civifix_exception_handler)
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "success": False,
+            "message": exc.detail,
+            "error_code": "HTTP_ERROR"
+        }
+    )
+
 app.add_exception_handler(Exception, global_exception_handler)
 
 # Include routers
@@ -110,6 +132,24 @@ app.include_router(
     worker_router,
     prefix="/api/v1/worker",
     tags=["Worker"]
+)
+
+app.include_router(
+    notification_router,
+    prefix="/api/v1/notifications",
+    tags=["Notifications"]
+)
+
+app.include_router(
+    upload_router,
+    prefix="/api/v1/upload",
+    tags=["Uploads"]
+)
+
+app.include_router(
+    settings_router,
+    prefix="/api/v1/admin/settings",
+    tags=["Admin Settings"]
 )
 
 

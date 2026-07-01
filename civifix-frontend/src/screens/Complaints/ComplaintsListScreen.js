@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useContext } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -9,9 +9,11 @@ import {
   StyleSheet,
   Platform,
   StatusBar,
+  TextInput,
 } from "react-native";
 import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import authService from "../../services/authService";
+import { AuthContext } from "../../context/AuthContext";
 import { getErrorMessage } from "../../services/api";
 import ComplaintCard from "./ComplaintCard";
 
@@ -30,11 +32,10 @@ const SUCCESS       = "#059669";
 // ─── STATUS CONFIG (for filter tabs) ─────────────────────────────────────────
 const FILTERS = [
   { key: "ALL",         label: "All",         icon: "format-list-bulleted"     },
-  { key: "PENDING",     label: "Pending",      icon: "clock-outline"            },
-  { key: "OPEN",        label: "Open",         icon: "folder-open-outline"      },
-  { key: "IN_PROGRESS", label: "In Progress",  icon: "progress-wrench"          },
-  { key: "RESOLVED",    label: "Resolved",     icon: "check-circle-outline"     },
-  { key: "REJECTED",    label: "Rejected",     icon: "close-circle-outline"     },
+  { key: "ACTIVE",      label: "Active",      icon: "progress-wrench"          },
+  { key: "RESOLVED",    label: "Resolved",    icon: "check-circle-outline"     },
+  { key: "REOPENED",    label: "Reopened",    icon: "folder-open-outline"      },
+  { key: "CLOSED",      label: "Closed",      icon: "archive-outline"          },
 ];
 
 const STATUS_COLOR = {
@@ -46,6 +47,20 @@ const STATUS_COLOR = {
   CLOSED:      GRAY_400,
   REJECTED:    ERROR,
 };
+
+const CATEGORIES = [
+  { value: "ALL", label: "All Types" },
+  { value: "GARBAGE", label: "Garbage" },
+  { value: "ROAD_DAMAGE", label: "Roads" },
+  { value: "POTHOLE", label: "Pothole" },
+  { value: "STREETLIGHT", label: "Lights" },
+  { value: "WATER_SUPPLY", label: "Water" },
+  { value: "DRAINAGE", label: "Drainage" },
+  { value: "SANITATION", label: "Sanitation" },
+  { value: "TREE_CUTTING", label: "Trees" },
+  { value: "CONSTRUCTION", label: "Construction" },
+  { value: "OTHER", label: "Other" },
+];
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 const extractComplaints = (payload) => {
@@ -118,7 +133,8 @@ const SummaryChips = ({ complaints }) => {
 const FilterTabs = ({ active, onChange, complaints }) => {
   const counts = complaints.reduce((acc, c) => {
     const s = (c.status || "PENDING").toUpperCase();
-    acc[s] = (acc[s] || 0) + 1;
+    if (["PENDING", "OPEN", "ASSIGNED", "IN_PROGRESS"].includes(s)) acc["ACTIVE"] = (acc["ACTIVE"] || 0) + 1;
+    else acc[s] = (acc[s] || 0) + 1;
     return acc;
   }, {});
 
@@ -165,17 +181,43 @@ export const ComplaintsListScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError]           = useState("");
   const [activeFilter, setActiveFilter] = useState("ALL");
+  const [activeCategory, setActiveCategory] = useState("ALL");
 
-  const loadComplaints = useCallback(async () => {
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const { user } = useContext(AuthContext);
+
+  const loadComplaints = useCallback(async (pageNum = 1) => {
     try {
+      if (pageNum === 1) setLoading(true);
+      else setLoadingMore(true);
       setError("");
-      const payload = await authService.getComplaints({ limit: 50 });
-      setComplaints(extractComplaints(payload));
+      
+      let payload;
+      if (user?.role === "INSPECTOR") {
+        payload = await authService.getWardComplaints({ page: pageNum, limit: 10 });
+      } else if (user?.role === "WORKER") {
+        payload = await authService.getAssignedComplaints({ page: pageNum, limit: 10 });
+      } else {
+        payload = await authService.getComplaints({ page: pageNum, limit: 10 });
+      }
+      
+      const newComplaints = extractComplaints(payload);
+      if (pageNum === 1) {
+        setComplaints(newComplaints);
+      } else {
+        setComplaints(prev => [...prev, ...newComplaints]);
+      }
+      setHasMore(newComplaints.length === 10);
+      setPage(pageNum);
     } catch (err) {
       setError(getErrorMessage(err, "Unable to load complaints"));
     } finally {
       setLoading(false);
       setRefreshing(false);
+      setLoadingMore(false);
     }
   }, []);
 
@@ -189,9 +231,16 @@ export const ComplaintsListScreen = ({ navigation }) => {
     loadComplaints();
   };
 
-  const filtered = activeFilter === "ALL"
-    ? complaints
-    : complaints.filter((c) => (c.status || "").toUpperCase() === activeFilter);
+  const filtered = complaints.filter((c) => {
+    const s = (c.status || "").toUpperCase();
+    let matchesStatus = false;
+    if (activeFilter === "ALL") matchesStatus = true;
+    else if (activeFilter === "ACTIVE") matchesStatus = ["PENDING", "OPEN", "ASSIGNED", "IN_PROGRESS"].includes(s);
+    else matchesStatus = s === activeFilter;
+
+    const matchesCategory = activeCategory === "ALL" || c.complaint_type === activeCategory;
+    return matchesStatus && matchesCategory;
+  });
 
   return (
     <View style={styles.flex}>
@@ -205,10 +254,10 @@ export const ComplaintsListScreen = ({ navigation }) => {
         </View>
         <TouchableOpacity
           style={styles.headerAddBtn}
-          onPress={() => navigation.navigate("CreateComplaint")}
+          onPress={() => navigation.navigate("SavedDrafts")}
           activeOpacity={0.85}
         >
-          <Icon name="plus" size={22} color="#fff" />
+          <Icon name="file-document-edit-outline" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
 
@@ -226,6 +275,17 @@ export const ComplaintsListScreen = ({ navigation }) => {
           keyExtractor={(item) => item._id || item.complaint_id || String(Math.random())}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          onEndReached={() => {
+            if (hasMore && !loadingMore && !loading) {
+              loadComplaints(page + 1);
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          windowSize={11}
+          removeClippedSubviews={true}
+          ListFooterComponent={loadingMore ? <ActivityIndicator size="small" color={PRIMARY} style={{ margin: 20 }} /> : null}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -239,6 +299,28 @@ export const ComplaintsListScreen = ({ navigation }) => {
               <View>
                 {/* Summary chips */}
                 <SummaryChips complaints={complaints} />
+
+                {/* Category Filter */}
+                <FlatList
+                  horizontal
+                  data={CATEGORIES}
+                  keyExtractor={(c) => c.value}
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.categoryList}
+                  renderItem={({ item }) => {
+                    const isSel = activeCategory === item.value;
+                    return (
+                      <TouchableOpacity
+                        onPress={() => setActiveCategory(item.value)}
+                        style={[styles.categoryChip, isSel && styles.categoryChipActive]}
+                      >
+                        <Text style={[styles.categoryChipText, isSel && styles.categoryChipTextActive]}>
+                          {item.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  }}
+                />
 
                 {/* Filter tabs */}
                 <FilterTabs
@@ -282,16 +364,7 @@ export const ComplaintsListScreen = ({ navigation }) => {
         />
       )}
 
-      {/* ── FAB ── */}
-      {!loading && !error && (
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={() => navigation.navigate("CreateComplaint")}
-          activeOpacity={0.85}
-        >
-          <Icon name="plus" size={26} color="#fff" />
-        </TouchableOpacity>
-      )}
+
     </View>
   );
 };
@@ -328,6 +401,34 @@ const styles = StyleSheet.create({
   chip:       { flex: 1, alignItems: "center" },
   chipValue:  { fontSize: 20, fontWeight: "900" },
   chipLabel:  { fontSize: 10, color: GRAY_400, fontWeight: "600", marginTop: 2, textTransform: "uppercase", letterSpacing: 0.4 },
+
+  /* Search */
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    marginHorizontal: 16,
+    marginTop: 12,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    height: 44,
+    borderWidth: 1,
+    borderColor: GRAY_200,
+  },
+  searchIcon: { marginRight: 8 },
+  searchInput: { flex: 1, fontSize: 14, color: GRAY_800 },
+  
+  /* Categories */
+  categoryList: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4, gap: 8 },
+  categoryChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: GRAY_200,
+  },
+  categoryChipActive: { backgroundColor: PRIMARY },
+  categoryChipText: { fontSize: 12, fontWeight: "600", color: GRAY_600 },
+  categoryChipTextActive: { color: "#fff" },
 
   /* filter tabs */
   filterList: { paddingHorizontal: 16, paddingVertical: 12, gap: 8 },
@@ -397,9 +498,14 @@ const styles = StyleSheet.create({
   },
   retryText: { color: "#fff", fontWeight: "700", fontSize: 14 },
 
-  /* FAB */
+  /* FABs */
+  fabContainer: {
+    position: "absolute",
+    bottom: 24,
+    right: 20,
+    flexDirection: "row",
+  },
   fab: {
-    position: "absolute", bottom: 24, right: 20,
     width: 56, height: 56, borderRadius: 28,
     backgroundColor: PRIMARY,
     alignItems: "center", justifyContent: "center",

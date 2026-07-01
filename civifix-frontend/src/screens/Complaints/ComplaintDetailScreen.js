@@ -9,11 +9,15 @@ import {
   Platform,
   StatusBar,
   Dimensions,
+  TextInput,
+  Image,
 } from "react-native";
 import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import authService from "../../services/authService";
 import { getErrorMessage } from "../../services/api";
 import { SPACING } from "../../constants/theme";
+
+import { API_URL } from "../../constants/endpoints";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -163,6 +167,13 @@ function HistoryItem({ item, complaint, isLast }) {
         {item.remarks ? (
           <Text style={styles.historyRemarks}>{item.remarks}</Text>
         ) : null}
+        {item.new_status && (item.new_status.toUpperCase() === "RESOLVED" || item.new_status.toUpperCase() === "CLOSED") && complaint?.proof_images?.length > 0 && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8 }}>
+            {complaint.proof_images.map((img, idx) => (
+              <Image key={idx} source={{ uri: img.startsWith("http") ? img : `${API_URL}${img}` }} style={{ width: 80, height: 80, borderRadius: 8, marginRight: 8 }} />
+            ))}
+          </ScrollView>
+        )}
         {item.created_at && (
           <Text style={styles.historyTime}>{formatDate(item.created_at)}</Text>
         )}
@@ -177,8 +188,13 @@ export const ComplaintDetailScreen = ({ route, navigation }) => {
   const [complaint, setComplaint] = useState(initialComplaint);
   const [loading, setLoading]     = useState(Boolean(initialComplaint?._id));
   const [error, setError]         = useState("");
+  
+  const [rating, setRating] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [reopenReason, setReopenReason] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const complaintId = initialComplaint?._id;
+  const complaintId = initialComplaint?._id || initialComplaint?.complaint_id;
 
   useEffect(() => {
     const load = async () => {
@@ -195,6 +211,38 @@ export const ComplaintDetailScreen = ({ route, navigation }) => {
     };
     load();
   }, [complaintId]);
+
+  const handleSubmitFeedback = async () => {
+    if (rating === 0) return alert("Please select a rating");
+    try {
+      setSubmitting(true);
+      await authService.submitFeedback(complaintId, { rating, feedback });
+      alert("Feedback submitted successfully!");
+      // Reload complaint
+      const data = await authService.getComplaint(complaintId);
+      setComplaint(data);
+    } catch (err) {
+      alert(getErrorMessage(err, "Failed to submit feedback"));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleReopen = async () => {
+    if (!reopenReason.trim()) return alert("Please provide a reason to reopen");
+    try {
+      setSubmitting(true);
+      await authService.reopenComplaint(complaintId, reopenReason);
+      alert("Complaint reopened successfully!");
+      // Reload complaint
+      const data = await authService.getComplaint(complaintId);
+      setComplaint(data);
+    } catch (err) {
+      alert(getErrorMessage(err, "Failed to reopen complaint"));
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const statusCfg = getStatus(complaint?.status);
 
@@ -282,6 +330,64 @@ export const ComplaintDetailScreen = ({ route, navigation }) => {
               </>
             )}
           </View>
+
+          {/* ── FEEDBACK & RATING (If CLOSED/RESOLVED) ── */}
+          {complaint && ["closed", "resolved"].includes(complaint.status?.toLowerCase()) && !complaint.rating && (
+            <View style={styles.card}>
+              <SectionTitle title="Feedback & Rating" icon="star-outline" />
+              <View style={styles.ratingRow}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <TouchableOpacity key={star} onPress={() => setRating(star)}>
+                    <Icon name={rating >= star ? "star" : "star-outline"} size={32} color={rating >= star ? "#F59E0B" : GRAY_400} />
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Share your experience (optional)"
+                placeholderTextColor={GRAY_400}
+                value={feedback}
+                onChangeText={setFeedback}
+                multiline
+                numberOfLines={3}
+              />
+              <TouchableOpacity style={styles.actionBtn} onPress={handleSubmitFeedback} disabled={submitting}>
+                {submitting ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.actionBtnText}>Submit Feedback</Text>}
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* ── ALREADY RATED ── */}
+          {complaint?.rating && (
+            <View style={styles.card}>
+              <SectionTitle title="Your Feedback" icon="star-check-outline" />
+              <View style={styles.ratingRow}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Icon key={star} name={complaint.rating >= star ? "star" : "star-outline"} size={24} color={complaint.rating >= star ? "#F59E0B" : GRAY_400} />
+                ))}
+              </View>
+              {complaint.feedback && <Text style={styles.feedbackText}>{complaint.feedback}</Text>}
+            </View>
+          )}
+
+          {/* ── REOPEN COMPLAINT (If CLOSED/RESOLVED) ── */}
+          {complaint && ["closed", "resolved"].includes(complaint.status?.toLowerCase()) && (
+            <View style={styles.card}>
+              <SectionTitle title="Issue not fixed?" icon="refresh" />
+              <TextInput
+                style={styles.textInput}
+                placeholder="Explain why this needs to be reopened..."
+                placeholderTextColor={GRAY_400}
+                value={reopenReason}
+                onChangeText={setReopenReason}
+                multiline
+                numberOfLines={3}
+              />
+              <TouchableOpacity style={[styles.actionBtn, { backgroundColor: ERROR }]} onPress={handleReopen} disabled={submitting}>
+                {submitting ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.actionBtnText}>Reopen Complaint</Text>}
+              </TouchableOpacity>
+            </View>
+          )}
 
           {/* ── HISTORY ── */}
           <View style={styles.card}>
@@ -468,6 +574,20 @@ const styles = StyleSheet.create({
   },
   emptyHistoryText: { fontSize: 14, fontWeight: "700", color: GRAY_600, marginTop: SPACING.xs },
   emptyHistorySub:  { fontSize: 12, color: GRAY_400, textAlign: "center", lineHeight: 18 },
+
+  /* ── ACTIONS (FEEDBACK/REOPEN) ── */
+  ratingRow: { flexDirection: "row", gap: SPACING.sm, marginBottom: SPACING.md },
+  textInput: {
+    backgroundColor: GRAY_50, borderWidth: 1, borderColor: GRAY_200,
+    borderRadius: 12, padding: SPACING.md, fontSize: 14, color: GRAY_800,
+    marginBottom: SPACING.md, textAlignVertical: "top",
+  },
+  actionBtn: {
+    backgroundColor: PRIMARY, paddingVertical: 14, borderRadius: 12,
+    alignItems: "center", justifyContent: "center",
+  },
+  actionBtnText: { color: "#fff", fontWeight: "700", fontSize: 14 },
+  feedbackText: { fontSize: 14, color: GRAY_600, marginTop: SPACING.sm },
 });
 
 export default ComplaintDetailScreen;

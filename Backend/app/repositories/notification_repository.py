@@ -29,14 +29,19 @@ class NotificationRepository:
         self,
         user_id: str,
         skip: int = 0,
-        limit: int = 20
+        limit: int = 20,
+        is_read: Optional[bool] = None
     ) -> tuple[List[dict], int]:
         """Get notifications for a user"""
         try:
-            total = await self.collection.count_documents({"user_id": ObjectId(user_id)})
+            query = {"user_id": ObjectId(user_id)}
+            if is_read is not None:
+                query["is_read"] = is_read
+                
+            total = await self.collection.count_documents(query)
             
             notifications = await self.collection.find(
-                {"user_id": ObjectId(user_id)}
+                query
             ).skip(skip).limit(limit).sort("created_at", -1).to_list(length=limit)
             
             return notifications, total

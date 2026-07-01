@@ -6,9 +6,18 @@ import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import { AuthContext } from "../context/AuthContext";
 import DashboardScreen from "../screens/Dashboard/DashboardScreen";
 import ProfileScreen from "../screens/Profile/ProfileScreen";
+import EditProfileScreen from "../screens/Profile/EditProfileScreen";
+import MyNotificationsScreen from "../screens/Profile/MyNotificationsScreen";
+import NotificationPreferencesScreen from "../screens/Profile/NotificationPreferencesScreen";
+import FAQScreen from "../screens/Profile/FAQScreen";
+import ContactSupportScreen from "../screens/Profile/ContactSupportScreen";
 import ComplaintsListScreen from "../screens/Complaints/ComplaintsListScreen";
 import CreateComplaintScreen from "../screens/Complaints/CreateComplaintScreen";
+import ComplaintPreviewScreen from "../screens/Complaints/ComplaintPreviewScreen";
+import ComplaintSuccessScreen from "../screens/Complaints/ComplaintSuccessScreen";
 import ComplaintDetailScreen from "../screens/Complaints/ComplaintDetailScreen";
+import NearbyComplaintsMapScreen from "../screens/Complaints/NearbyComplaintsMapScreen";
+import SavedDraftsScreen from "../screens/Complaints/SavedDraftsScreen";
 import WardListScreen from "../screens/Ward/WardListScreen";
 import WardDetailScreen from "../screens/Ward/WardDetailScreen";
 import { COLORS, SPACING } from "../constants/theme";
@@ -27,6 +36,8 @@ const DashboardStack = () => {
     >
       <Stack.Screen name="DashboardHome" component={DashboardScreen} />
       <Stack.Screen name="CreateComplaint" component={CreateComplaintScreen} />
+      <Stack.Screen name="ComplaintPreview" component={ComplaintPreviewScreen} />
+      <Stack.Screen name="ComplaintSuccess" component={ComplaintSuccessScreen} />
       <Stack.Screen name="ComplaintDetail" component={ComplaintDetailScreen} />
     </Stack.Navigator>
   );
@@ -42,7 +53,11 @@ const ComplaintsStack = () => {
     >
       <Stack.Screen name="ComplaintsHome" component={ComplaintsListScreen} />
       <Stack.Screen name="CreateComplaint" component={CreateComplaintScreen} />
+      <Stack.Screen name="ComplaintPreview" component={ComplaintPreviewScreen} />
+      <Stack.Screen name="ComplaintSuccess" component={ComplaintSuccessScreen} />
       <Stack.Screen name="ComplaintDetail" component={ComplaintDetailScreen} />
+      <Stack.Screen name="NearbyComplaintsMap" component={NearbyComplaintsMapScreen} />
+      <Stack.Screen name="SavedDrafts" component={SavedDraftsScreen} />
     </Stack.Navigator>
   );
 };
@@ -56,6 +71,11 @@ const ProfileStack = () => {
       }}
     >
       <Stack.Screen name="ProfileHome" component={ProfileScreen} />
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+      <Stack.Screen name="MyNotifications" component={MyNotificationsScreen} />
+      <Stack.Screen name="NotificationPreferences" component={NotificationPreferencesScreen} />
+      <Stack.Screen name="FAQ" component={FAQScreen} />
+      <Stack.Screen name="ContactSupport" component={ContactSupportScreen} />
     </Stack.Navigator>
   );
 };
@@ -134,66 +154,25 @@ export const AppStack = () => {
         />
       )}
 
-      <Tab.Screen
-        name="Raise"
-        component={DashboardStack}
-        options={{
-          tabBarLabel: "",
-          tabBarIcon: ({ focused }) => (
-            <View
-              style={{
-                width: 54,
-                height: 54,
-                borderRadius: 27,
-                backgroundColor: focused ? COLORS.secondary : COLORS.primary,
-                justifyContent: "center",
-                alignItems: "center",
-                marginBottom: 22,
-                shadowColor: COLORS.primary,
-                shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: 0.25,
-                shadowRadius: 12,
-                elevation: 8,
-              }}
-            >
-              <Icon name="plus" color={COLORS.card} size={28} />
-            </View>
-          ),
-          tabBarButton: (props) => (
-            <TouchableOpacity
-              {...props}
-              activeOpacity={0.85}
-              onPress={() =>
-                props.accessibilityState?.selected
-                  ? props.onPress?.()
-                  : props.onPress?.()
-              }
-            />
-          ),
-          listeners: ({ navigation }) => ({
-            tabPress: (e) => {
-              e.preventDefault();
-              navigation.navigate("Dashboard", { screen: "CreateComplaint" });
-            },
-          }),
-        }}
-      />
-      <Tab.Screen
-        name="Status"
-        component={DashboardStack}
-        options={{
-          tabBarLabel: "Status",
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="magnify" color={color} size={size} />
-          ),
-          listeners: ({ navigation }) => ({
-            tabPress: (e) => {
-              e.preventDefault();
-              navigation.navigate("Complaints", { screen: "ComplaintsHome" });
-            },
-          }),
-        }}
-      />
+
+      {user?.role !== "INSPECTOR" && (
+        <Tab.Screen
+          name="Status"
+          component={DashboardStack}
+          options={{
+            tabBarLabel: "Status",
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="magnify" color={color} size={size} />
+            ),
+            listeners: ({ navigation }) => ({
+              tabPress: (e) => {
+                e.preventDefault();
+                navigation.navigate("Complaints", { screen: "ComplaintsHome" });
+              },
+            }),
+          }}
+        />
+      )}
       <Tab.Screen
         name="Profile"
         component={ProfileStack}

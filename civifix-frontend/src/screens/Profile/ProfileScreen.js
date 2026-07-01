@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import { AuthContext } from "../../context/AuthContext";
 import { Card, GradientBackground } from "../../components";
 import { COLORS, GRADIENTS, SPACING, FONT_SIZES, SHADOWS } from "../../constants/theme";
@@ -189,42 +189,50 @@ const buildMenuSections = ({ role, navigation, meData }) => {
         id: "personal",
         title: "Personal Information",
         subtitle: "Edit name, phone, address",
-        icon: "account-edit-outline",
+        icon: "account",
         color: COLORS.primary,
         onPress: () => navigation.navigate("EditProfile"),
       },
       {
         id: "notifications",
-        title: "Notifications",
-        subtitle: "Manage your alerts",
-        icon: "bell-outline",
+        title: "My Notifications",
+        subtitle: "View your latest alerts",
+        icon: "bell",
         color: "#D97706",
-        onPress: () => {},
+        onPress: () => navigation.navigate("MyNotifications"),
       },
       {
         id: "settings",
-        title: "Settings",
-        subtitle: "App preferences",
-        icon: "cog-outline",
+        title: "Notification Settings",
+        subtitle: "Manage your alert preferences",
+        icon: "cog",
         color: COLORS.primary,
-        onPress: () => {},
+        onPress: () => navigation.navigate("NotificationPreferences"),
       },
     ],
     support: [
       {
         id: "help",
-        title: "Help & Support",
-        subtitle: "FAQs, contact us",
-        icon: "help-circle-outline",
+        title: "Help & FAQs",
+        subtitle: "Frequently asked questions",
+        icon: "help-circle",
         color: "#0891B2",
-        onPress: () => {},
+        onPress: () => navigation.navigate("FAQ"),
+      },
+      {
+        id: "contact",
+        title: "Contact Support",
+        subtitle: "Get in touch with us",
+        icon: "email",
+        color: COLORS.primary,
+        onPress: () => navigation.navigate("ContactSupport"),
       },
       {
         id: "about",
         title: "About CiviFix",
         subtitle: "Version, licenses",
-        icon: "information-outline",
-        color: COLORS.primary,
+        icon: "information",
+        color: COLORS.textGray,
         onPress: () => {},
       },
     ],
@@ -246,17 +254,14 @@ const buildMenuSections = ({ role, navigation, meData }) => {
     roleSection.push(
       { id: "inspectors",title: "My Inspectors",      subtitle: `District: ${meData?.district ?? "—"}`, icon: "account-tie",      color: "#0891B2",  onPress: () => navigation.navigate("InspectorsList") },
       { id: "workers",   title: "My Workers",         subtitle: "Workers in your district",              icon: "account-hard-hat", color: "#059669",  onPress: () => navigation.navigate("WorkersList")   },
-      { id: "wards",     title: "Wards",              subtitle: "Ward management",                       icon: "map-marker-radius",color: COLORS.primary, onPress: () => navigation.navigate("WardsList") },
+      { id: "wards",     title: "Ward Management",    subtitle: "View and manage wards",                 icon: "map-marker-radius",color: COLORS.primary, onPress: () => navigation.navigate("Wards", { screen: "WardList" }) },
       { id: "complaints",title: "All Complaints",     subtitle: "District complaint board",              icon: "clipboard-list",   color: "#D97706",  onPress: () => navigation.getParent()?.navigate("Complaints") },
     );
   }
 
   if (role === "INSPECTOR") {
-    roleSection.push(
-      { id: "ward",      title: "My Ward",           subtitle: "Ward details & map",      icon: "map-marker-radius",  color: COLORS.primary, onPress: () => navigation.navigate("WardDetail")     },
-      { id: "workers",   title: "Ward Workers",      subtitle: "Workers in your ward",    icon: "account-hard-hat",   color: "#059669",      onPress: () => navigation.navigate("WorkersList")   },
-      { id: "complaints",title: "Ward Complaints",   subtitle: "All open & closed items", icon: "clipboard-list",     color: "#D97706",      onPress: () => navigation.getParent()?.navigate("Complaints") },
-    );
+    // Inspector now uses the main AppStack tabs for Wards and Complaints.
+    // The Profile screen only needs standard account and support items.
   }
 
   if (role === "WORKER") {
@@ -268,7 +273,7 @@ const buildMenuSections = ({ role, navigation, meData }) => {
 
   if (role === "CITIZEN") {
     roleSection.push(
-      { id: "complaints",title: "My Complaints",     subtitle: "Track your submissions",  icon: "clipboard-text-outline",  color: COLORS.primary, onPress: () => navigation.getParent()?.navigate("Complaints") },
+      { id: "complaints",title: "My Complaints",     subtitle: "Track your submissions",  icon: "clipboard-list",  color: COLORS.primary, onPress: () => navigation.getParent()?.navigate("Complaints") },
     );
   }
 
@@ -453,32 +458,7 @@ export const ProfileScreen = ({ navigation }) => {
         {/* ── Content ── */}
         <View style={{ paddingHorizontal: SPACING.lg }}>
 
-          {/* Ward Info Card for INSPECTOR */}
-          {role === "INSPECTOR" && (
-            <>
-              <SectionLabel>Assigned Ward</SectionLabel>
-              <WardInfoCard
-                ward={wardData}
-                wardLoading={wardLoading}
-                onPress={() => navigation.navigate("Wards", { screen: "WardList" })}
-              />
-            </>
-          )}
 
-          {/* Ward Info Card for DISTRICT_ADMIN */}
-          {role === "DISTRICT_ADMIN" && (
-            <>
-              <SectionLabel>Ward Management</SectionLabel>
-              <MenuItem
-                id="wards"
-                icon="map-marker-radius"
-                title="Manage Wards"
-                subtitle="View and manage all wards in your district"
-                color={COLORS.primary}
-                onPress={() => navigation.navigate("Wards", { screen: "WardList" })}
-              />
-            </>
-          )}
 
           {/* Role section */}
           {roleSection.length > 0 && (

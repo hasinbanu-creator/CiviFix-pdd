@@ -17,7 +17,8 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Location from "expo-location";
-import { Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert, Image } from "react-native";
 import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import { COLORS, FONT_SIZES, SPACING, SHADOWS } from "../../constants/theme";
 import authService from "../../services/authService";
@@ -312,8 +313,9 @@ const PrioritySelector = ({ value, onChange }) => (
 );
 
 // ─── MAIN SCREEN ──────────────────────────────────────────────────────────────
-export const CreateComplaintScreen = ({ navigation }) => {
+export const CreateComplaintScreen = ({ route, navigation }) => {
   const { user } = useContext(AuthContext);
+  const initialDraft = route.params?.draft;
 
   const [form, setForm] = useState({
     ward_id: "", complaint_type: "", description: "",
@@ -326,6 +328,31 @@ export const CreateComplaintScreen = ({ navigation }) => {
   const [wardsLoading, setWardsLoading] = useState(true);
   const [gpsLoading, setGpsLoading]     = useState(false);
   const [successData, setSuccessData]   = useState(null);
+
+  // Draft loading
+  useEffect(() => {
+    if (initialDraft) {
+      setForm(initialDraft);
+      return;
+    }
+    const loadDraft = async () => {
+      try {
+        const draft = await AsyncStorage.getItem("complaintDraft");
+        if (draft) {
+          setForm(JSON.parse(draft));
+        }
+      } catch (e) {}
+    };
+    loadDraft();
+  }, []);
+
+  // Draft saving
+  useEffect(() => {
+    const saveDraft = setTimeout(() => {
+      AsyncStorage.setItem("complaintDraft", JSON.stringify(form));
+    }, 1000);
+    return () => clearTimeout(saveDraft);
+  }, [form]);
 
   useEffect(() => { fetchWards(); }, []);
 
@@ -388,24 +415,12 @@ export const CreateComplaintScreen = ({ navigation }) => {
 
   const submit = async () => {
     if (!validate()) return;
-    setLoading(true);
-    setServerError("");
-    try {
-      const payload = {
-        ward_id: form.ward_id, complaint_type: form.complaint_type,
-        description: form.description.trim(), image_urls: [], priority: form.priority,
-        ...(form.latitude  && { latitude:  Number(form.latitude)  }),
-        ...(form.longitude && { longitude: Number(form.longitude) }),
-        ...(form.address.trim()      && { address:      form.address.trim()      }),
-        ...(form.citizen_note.trim() && { citizen_note: form.citizen_note.trim() }),
-      };
-      const created = await authService.createComplaint(payload);
-      setSuccessData(created);
-    } catch (err) {
-      setServerError(getErrorMessage(err, "Unable to submit. Please try again."));
-    } finally {
-      setLoading(false);
-    }
+    navigation.navigate("ComplaintPreview", {
+      form,
+      ward: wardItems.find((w) => w.value === form.ward_id),
+      selectedType,
+      selectedPri,
+    });
   };
 
   const wardItems = wards.map((w) => ({
@@ -589,15 +604,11 @@ export const CreateComplaintScreen = ({ navigation }) => {
             activeOpacity={0.85} style={styles.submitWrap}
           >
             <LinearGradient
-              colors={loading ? [GRAY_400, GRAY_400] : [PRIMARY, PRIMARY_DARK]}
+              colors={[PRIMARY, PRIMARY_DARK]}
               start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
               style={styles.submitBtn}
             >
-              {loading
-                ? <ActivityIndicator color="#fff" size="small" />
-                : <Icon name="send-outline" size={18} color="#fff" />
-              }
-              <Text style={styles.submitText}>{loading ? "Submitting…" : "Submit Complaint"}</Text>
+              <Text style={styles.submitText}>Preview & Submit</Text>
             </LinearGradient>
           </TouchableOpacity>
 
@@ -746,6 +757,23 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: "#A7F3D0", marginBottom: SPACING.md,
   },
   gpsFilledText: { flex: 1, color: "#065F46", fontSize: 12, fontWeight: "600" },
+
+  // ── Media ──
+  uploadBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: SPACING.sm,
+    borderWidth: 1.5, borderColor: PRIMARY, borderRadius: 12, borderStyle: "dashed",
+    paddingVertical: SPACING.md, paddingHorizontal: SPACING.md,
+    backgroundColor: PRIMARY_LIGHT, marginBottom: SPACING.md,
+  },
+  uploadBtnText: { color: PRIMARY, fontSize: 13, fontWeight: "700" },
+  imageScroll: { flexDirection: "row", marginTop: SPACING.sm },
+  imagePreviewWrap: { marginRight: SPACING.md, position: "relative" },
+  imagePreview: { width: 80, height: 80, borderRadius: 8 },
+  removeImageBtn: {
+    position: "absolute", top: -8, right: -8, width: 24, height: 24,
+    borderRadius: 12, backgroundColor: ERROR, alignItems: "center", justifyContent: "center",
+    borderWidth: 2, borderColor: "#fff",
+  },
 
   // ── Summary ──
   summaryCard: {

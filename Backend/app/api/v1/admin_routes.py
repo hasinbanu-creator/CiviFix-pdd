@@ -1,5 +1,6 @@
 """Admin API routes for user and role management"""
 from fastapi import APIRouter, HTTPException, status, Depends, Query
+from pydantic import BaseModel
 from typing import Dict, Any, List
 from app.schemas.user_schema import (
     CreateAdminSchema,
@@ -197,6 +198,73 @@ async def update_user_role(
     except Exception as e:
         return ResponseHandler.error(
             message="Failed to update role",
+            errors=str(e),
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+class EditUserSchema(BaseModel):
+    name: str = None
+    mobile_number: str = None
+    district: str = None
+    ward_id: str = None
+
+@router.put(
+    "/users/{user_id}",
+    summary="Edit user details",
+    dependencies=[Depends(require_role("DISTRICT_ADMIN", "SUPER_ADMIN"))]
+)
+async def edit_user(
+    user_id: str,
+    payload: EditUserSchema,
+    current_user: Dict[str, Any] = Depends(get_current_admin)
+):
+    """Edit user details (Name, Mobile, District, Ward)"""
+    try:
+        from bson import ObjectId
+        from datetime import datetime
+        
+        user = await db.users.find_one({"_id": ObjectId(user_id)})
+        if not user:
+            return ResponseHandler.error("User not found", status.HTTP_404_NOT_FOUND)
+            
+        if current_user.get("role") == "DISTRICT_ADMIN":
+            if user.get("district") != current_user.get("district"):
+                return ResponseHandler.error("Forbidden: District mismatch", status.HTTP_403_FORBIDDEN)
+                
+        update_data = {}
+        if payload.name: update_data["name"] = payload.name
+        if payload.mobile_number: update_data["mobile_number"] = payload.mobile_number
+        
+        if current_user.get("role") == "SUPER_ADMIN" and payload.district:
+            update_data["district"] = payload.district
+            
+        if payload.ward_id:
+            update_data["ward_id"] = ObjectId(payload.ward_id)
+            
+        update_data["updated_at"] = datetime.utcnow()
+        
+        await db.users.update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": update_data}
+        )
+        
+        # Log to audit_logs
+        await db.audit_logs.insert_one({
+            "action": "EDIT_USER",
+            "user_id": ObjectId(current_user["user_id"]),
+            "role": current_user.get("role"),
+            "target_id": str(user_id),
+            "target_type": "user",
+            "details": f"Updated fields: {list(update_data.keys())}",
+            "timestamp": datetime.utcnow()
+        })
+        
+        return ResponseHandler.success("User updated successfully")
+    except Exception as e:
+        import logging
+        logging.error(f"Error editing user: {str(e)}")
+        return ResponseHandler.error(
+            message="Failed to edit user",
             errors=str(e),
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
@@ -524,6 +592,237 @@ async def get_wards(
     except Exception as e:
         return ResponseHandler.error(
             message="Failed to retrieve wards",
+            errors=str(e),
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+# =========================
+# COMPLAINT MONITORING
+# =========================
+
+@router.get(
+    "/complaints",
+    summary="Monitor complaints",
+    dependencies=[Depends(require_role("DISTRICT_ADMIN", "SUPER_ADMIN"))]
+)
+async def get_admin_complaints(
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100),
+    status: str = Query(None),
+    priority: str = Query(None),
+    ward_id: str = Query(None),
+    search: str = Query(None),
+    current_user: Dict[str, Any] = Depends(get_current_admin)
+):
+    """
+    Get all complaints with filters.
+    DISTRICT_ADMIN only sees complaints in their district.
+    SUPER_ADMIN sees all.
+    """
+    try:
+        from bson import ObjectId
+        query = {}
+
+        if current_user.get("role") == "DISTRICT_ADMIN":
+            query["district_id"] = current_user.get("district")
+
+        if status:
+            statuses = [s.strip() for s in status.split(',')]
+            query["status"] = {"$in": statuses}
+            
+        if priority:
+            query["priority"] = priority
+            
+        if ward_id:
+            query["ward_id"] = ObjectId(ward_id)
+            
+        if search:
+            query["$or"] = [
+                {"complaint_id": {"$regex": search, "$options": "i"}},
+                {"title": {"$regex": search, "$options": "i"}}
+            ]
+
+        skip = (page - 1) * limit
+        
+        complaints = await db.complaints.find(query)\
+            .sort("created_at", -1)\
+            .skip(skip)\
+            .limit(limit)\
+            .to_list(length=limit)
+
+        total = await db.complaints.count_documents(query)
+
+        result = []
+        for complaint in complaints:
+            result.append({
+                "_id": str(complaint["_id"]),
+                "complaint_id": complaint.get("complaint_id"),
+                "title": complaint.get("title", complaint.get("complaint_type", "")),
+                "status": complaint.get("status"),
+                "priority": complaint.get("priority", "MEDIUM"),
+                "district_id": complaint.get("district_id"),
+                "ward_id": str(complaint.get("ward_id")) if complaint.get("ward_id") else None,
+                "created_at": complaint.get("created_at").isoformat() if complaint.get("created_at") else None
+            })
+
+        return ResponseHandler.success(
+            message="Complaints retrieved",
+            data={
+                "complaints": result,
+                "page": page,
+                "limit": limit,
+                "total": total,
+                "pages": (total + limit - 1) // limit
+            }
+        )
+    except Exception as e:
+        import logging
+        logging.error(f"Error fetching admin complaints: {str(e)}")
+        return ResponseHandler.error(
+            message="Failed to retrieve complaints",
+            errors=str(e),
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+from pydantic import BaseModel
+
+class AssignInspectorRequest(BaseModel):
+    inspector_id: str
+
+@router.patch(
+    "/complaints/{complaint_id}/assign",
+    summary="Assign inspector to complaint",
+    dependencies=[Depends(require_role("DISTRICT_ADMIN", "SUPER_ADMIN"))]
+)
+async def assign_complaint(
+    complaint_id: str,
+    payload: AssignInspectorRequest,
+    current_user: Dict[str, Any] = Depends(get_current_admin)
+):
+    """Assign or reassign an inspector to a complaint"""
+    try:
+        from bson import ObjectId
+        from datetime import datetime
+        
+        complaint = await db.complaints.find_one({"_id": ObjectId(complaint_id)})
+        if not complaint:
+            return ResponseHandler.error("Complaint not found", status.HTTP_404_NOT_FOUND)
+            
+        if current_user.get("role") == "DISTRICT_ADMIN":
+            if complaint.get("district_id") != current_user.get("district"):
+                return ResponseHandler.error("Forbidden: District mismatch", status.HTTP_403_FORBIDDEN)
+                
+        inspector = await db.users.find_one({"_id": ObjectId(payload.inspector_id), "role": "INSPECTOR"})
+        if not inspector:
+            return ResponseHandler.error("Inspector not found", status.HTTP_404_NOT_FOUND)
+            
+        old_status = complaint.get("status")
+        new_status = "ASSIGNED"
+        
+        await db.complaints.update_one(
+            {"_id": ObjectId(complaint_id)},
+            {"$set": {
+                "assigned_to": ObjectId(payload.inspector_id),
+                "status": new_status,
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        
+        await db.complaint_history.insert_one({
+            "complaint_id": ObjectId(complaint_id),
+            "action": "ASSIGNED",
+            "old_status": old_status,
+            "new_status": new_status,
+            "performed_by": ObjectId(current_user["user_id"]),
+            "role": current_user.get("role"),
+            "remarks": f"Assigned to inspector {inspector.get('name')}",
+            "timestamp": datetime.utcnow()
+        })
+        
+        # Log to audit_logs
+        await db.audit_logs.insert_one({
+            "action": "ASSIGN_COMPLAINT",
+            "user_id": ObjectId(current_user["user_id"]),
+            "role": current_user.get("role"),
+            "target_id": str(complaint_id),
+            "target_type": "complaint",
+            "details": f"Assigned complaint to inspector {payload.inspector_id}",
+            "timestamp": datetime.utcnow()
+        })
+        
+        return ResponseHandler.success(
+            message="Inspector assigned successfully",
+            data={"complaint_id": complaint_id, "status": new_status}
+        )
+    except Exception as e:
+        import logging
+        logging.error(f"Error assigning complaint: {str(e)}")
+        return ResponseHandler.error(
+            message="Failed to assign inspector",
+            errors=str(e),
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+from fastapi.responses import StreamingResponse
+import io
+import csv
+
+@router.post(
+    "/complaints/export",
+    summary="Export complaints as CSV",
+    dependencies=[Depends(require_role("DISTRICT_ADMIN", "SUPER_ADMIN"))]
+)
+async def export_complaints(
+    current_user: Dict[str, Any] = Depends(get_current_admin)
+):
+    """Export complaints to CSV format"""
+    try:
+        query = {}
+        if current_user.get("role") == "DISTRICT_ADMIN":
+            query["district_id"] = current_user.get("district")
+            
+        complaints = await db.complaints.find(query).sort("created_at", -1).to_list(length=10000)
+        
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Header
+        writer.writerow(["Complaint ID", "Title", "Type", "Status", "Priority", "District", "Created At", "Closed At"])
+        
+        for c in complaints:
+            writer.writerow([
+                c.get("complaint_id", ""),
+                c.get("title", ""),
+                c.get("complaint_type", ""),
+                c.get("status", ""),
+                c.get("priority", ""),
+                c.get("district_id", ""),
+                c.get("created_at", "").isoformat() if hasattr(c.get("created_at"), "isoformat") else "",
+                c.get("closed_at", "").isoformat() if hasattr(c.get("closed_at"), "isoformat") else ""
+            ])
+            
+        output.seek(0)
+        
+        # Log to audit_logs
+        from datetime import datetime
+        from bson import ObjectId
+        await db.audit_logs.insert_one({
+            "action": "EXPORT_COMPLAINTS",
+            "user_id": ObjectId(current_user["user_id"]),
+            "role": current_user.get("role"),
+            "timestamp": datetime.utcnow()
+        })
+        
+        return StreamingResponse(
+            iter([output.getvalue()]),
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename=complaints_export_{datetime.utcnow().strftime('%Y%m%d')}.csv"}
+        )
+    except Exception as e:
+        import logging
+        logging.error(f"Error exporting complaints: {str(e)}")
+        return ResponseHandler.error(
+            message="Failed to export complaints",
             errors=str(e),
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
         )

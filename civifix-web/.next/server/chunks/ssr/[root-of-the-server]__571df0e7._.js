@@ -215,14 +215,17 @@ const storeSession = (session)=>{
     ;
 };
 const e2eMocksEnabled = ("TURBOPACK compile-time value", "false") === "true";
-const e2eUser = {
-    id: "e2e-user-1",
-    email: "selenium-test@civifix.local",
-    name: "Selenium Citizen",
-    role: "CITIZEN",
-    mobile_number: "9876543210",
-    district: "e2e-district-1",
-    district_id: "e2e-district-1"
+const getE2EUser = ()=>{
+    const role = ("TURBOPACK compile-time falsy", 0) ? "TURBOPACK unreachable" : "CITIZEN";
+    return {
+        id: "e2e-user-1",
+        email: "selenium-test@civifix.local",
+        name: "Selenium " + role,
+        role: role,
+        mobile_number: "9876543210",
+        district: "e2e-district-1",
+        district_id: "e2e-district-1"
+    };
 };
 const e2eComplaints = [
     {
@@ -274,7 +277,7 @@ const e2eWards = [
 const e2eSession = ()=>({
         access_token: "e2e-access-token",
         refresh_token: "e2e-refresh-token",
-        user: e2eUser
+        user: getE2EUser()
     });
 const authService = {
     register: async (userData)=>{

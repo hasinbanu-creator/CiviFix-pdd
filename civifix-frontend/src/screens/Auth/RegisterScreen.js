@@ -35,15 +35,13 @@ const GRAY_800 = "#1F2937";
 /* ── API ── */
 const API_BASE = API_URL;
 
-async function fetchDistricts() {
-  const res = await fetch(`${API_BASE}/admin/districts?active_only=false`, {
-    headers: { accept: "application/json" },
-  });
-  if (!res.ok) throw new Error(`Failed to fetch districts: ${res.status}`);
+import api from "../../services/api";
 
-  const json = await res.json();
-  console.log("[Districts] Count:", json.data?.length);
-  return json.data || [];
+async function fetchDistricts() {
+  const res = await api.get("/admin/districts?active_only=false");
+  const data = res.data?.data || [];
+  console.log("[Districts] Count:", data.length);
+  return data;
 }
 
 

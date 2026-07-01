@@ -40,46 +40,46 @@ import { useAuth } from "@/context/auth-context";
 import { complaintsApi } from "@/services/api";
 
 const STATUS_CONFIG: Record<string, { color: string, bg: string, border: string, icon: any, label: string }> = {
-  PENDING:     { color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-200", icon: Clock, label: "Pending" },
-  OPEN:        { color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200", icon: FolderOpen, label: "Open" },
-  ASSIGNED:    { color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-200", icon: HardHat, label: "Assigned" },
-  WORKING:     { color: "text-cyan-600", bg: "bg-cyan-50", border: "border-cyan-200", icon: Wrench, label: "In Progress" },
-  IN_PROGRESS: { color: "text-cyan-600", bg: "bg-cyan-50", border: "border-cyan-200", icon: Wrench, label: "In Progress" },
-  CLOSED:      { color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200", icon: CheckCircle2, label: "Resolved" },
-  RESOLVED:    { color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200", icon: CheckCircle2, label: "Resolved" },
-  REJECTED:    { color: "text-red-600", bg: "bg-red-50", border: "border-red-200", icon: XCircle, label: "Rejected" },
+  PENDING:     { color: "text-accent", bg: "bg-accent/10", border: "border-accent/20", icon: Clock, label: "Pending" },
+  OPEN:        { color: "text-accent", bg: "bg-accent/10", border: "border-accent/20", icon: FolderOpen, label: "Open" },
+  ASSIGNED:    { color: "text-primary", bg: "bg-primary/10", border: "border-primary/20", icon: HardHat, label: "Assigned" },
+  WORKING:     { color: "text-secondary", bg: "bg-secondary/10", border: "border-secondary/20", icon: Wrench, label: "In Progress" },
+  IN_PROGRESS: { color: "text-secondary", bg: "bg-secondary/10", border: "border-secondary/20", icon: Wrench, label: "In Progress" },
+  CLOSED:      { color: "text-success", bg: "bg-success/10", border: "border-success/20", icon: CheckCircle2, label: "Resolved" },
+  RESOLVED:    { color: "text-success", bg: "bg-success/10", border: "border-success/20", icon: CheckCircle2, label: "Resolved" },
+  REJECTED:    { color: "text-destructive", bg: "bg-destructive/10", border: "border-destructive/20", icon: XCircle, label: "Rejected" },
 };
 
 const PRIORITY_CONFIG: Record<string, { color: string, bg: string, label: string }> = {
-  LOW:      { color: "text-emerald-600", bg: "bg-emerald-100", label: "Low" },
-  MEDIUM:   { color: "text-amber-600", bg: "bg-amber-100", label: "Medium" },
-  HIGH:     { color: "text-red-600", bg: "bg-red-100", label: "High" },
-  CRITICAL: { color: "text-red-900", bg: "bg-red-200", label: "Critical" },
+  LOW:      { color: "text-success", bg: "bg-success/10", label: "Low" },
+  MEDIUM:   { color: "text-accent", bg: "bg-accent/10", label: "Medium" },
+  HIGH:     { color: "text-destructive", bg: "bg-destructive/10", label: "High" },
+  CRITICAL: { color: "text-destructive", bg: "bg-destructive/20", label: "Critical" },
 };
 
 const TYPE_META: Record<string, { icon: any, color: string, bg: string, title: string }> = {
-  ROAD_DAMAGE:  { icon: Map, color: "text-red-600", bg: "bg-red-100", title: "Road Damage" },
-  GARBAGE:      { icon: ClipboardList, color: "text-cyan-600", bg: "bg-cyan-100", title: "Waste Collection" },
-  POTHOLE:      { icon: Map, color: "text-red-600", bg: "bg-red-100", title: "Pothole" },
-  STREETLIGHT:  { icon: Lightbulb, color: "text-amber-600", bg: "bg-amber-100", title: "Street Light" },
-  WATER_SUPPLY: { icon: Activity, color: "text-blue-600", bg: "bg-blue-100", title: "Water Supply" },
-  DRAINAGE:     { icon: Wrench, color: "text-cyan-600", bg: "bg-cyan-100", title: "Drainage Issue" },
-  SANITATION:   { icon: ClipboardList, color: "text-emerald-600", bg: "bg-emerald-100", title: "Sanitation" },
-  TREE_CUTTING: { icon: TreePine, color: "text-emerald-600", bg: "bg-emerald-100", title: "Tree Issue" },
-  CONSTRUCTION: { icon: Wrench, color: "text-amber-600", bg: "bg-amber-100", title: "Construction Block" },
-  OTHER:        { icon: AlertCircle, color: "text-slate-600", bg: "bg-slate-100", title: "Civic Issue" },
+  ROAD_DAMAGE:  { icon: Map, color: "text-destructive", bg: "bg-destructive/10", title: "Road Damage" },
+  GARBAGE:      { icon: ClipboardList, color: "text-secondary", bg: "bg-secondary/10", title: "Waste Collection" },
+  POTHOLE:      { icon: Map, color: "text-destructive", bg: "bg-destructive/10", title: "Pothole" },
+  STREETLIGHT:  { icon: Lightbulb, color: "text-primary", bg: "bg-primary/10", title: "Street Light" },
+  WATER_SUPPLY: { icon: Activity, color: "text-primary", bg: "bg-primary/10", title: "Water Supply" },
+  DRAINAGE:     { icon: Wrench, color: "text-secondary", bg: "bg-secondary/10", title: "Drainage Issue" },
+  SANITATION:   { icon: ClipboardList, color: "text-secondary", bg: "bg-secondary/10", title: "Sanitation" },
+  TREE_CUTTING: { icon: TreePine, color: "text-success", bg: "bg-success/10", title: "Tree Issue" },
+  CONSTRUCTION: { icon: Wrench, color: "text-accent", bg: "bg-accent/10", title: "Construction Block" },
+  OTHER:        { icon: AlertCircle, color: "text-destructive", bg: "bg-destructive/10", title: "Civic Issue" },
 };
 
 function InfoRow({ icon: Icon, label, value }: { icon: any, label: string, value?: string | null }) {
   if (!value) return null;
   return (
-    <div className="flex items-start gap-4 mb-4">
-      <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0 mt-1">
-        <Icon className="w-4 h-4 text-blue-600" />
+    <div className="flex items-start gap-4 mb-5">
+      <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center shrink-0 mt-1 border border-border/50">
+        <Icon className="w-5 h-5 text-muted-foreground" />
       </div>
       <div className="flex-1">
-        <p className="text-[10px] font-extrabold text-slate-400 tracking-widest uppercase mb-1">{label}</p>
-        <p className="text-sm font-semibold text-slate-800 leading-relaxed">{value}</p>
+        <p className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase mb-1">{label}</p>
+        <p className="text-sm font-semibold text-foreground leading-relaxed">{value}</p>
       </div>
     </div>
   );
@@ -88,12 +88,12 @@ function InfoRow({ icon: Icon, label, value }: { icon: any, label: string, value
 function NoteCard({ icon: Icon, label, value, colorClass, borderClass, bgClass }: any) {
   if (!value) return null;
   return (
-    <div className={`border-l-4 ${borderClass} bg-slate-50 rounded-xl p-4 mb-4`}>
-      <div className="flex items-center gap-2 mb-2">
-        <Icon className={`w-4 h-4 ${colorClass}`} />
-        <span className={`text-xs font-bold ${colorClass}`}>{label}</span>
+    <div className={`border-l-4 ${borderClass} bg-muted/30 rounded-2xl p-5 mb-4`}>
+      <div className="flex items-center gap-2 mb-3">
+        <Icon className={`w-5 h-5 ${colorClass}`} />
+        <span className={`text-sm font-bold ${colorClass}`}>{label}</span>
       </div>
-      <p className="text-sm font-medium text-slate-600 leading-relaxed">{value}</p>
+      <p className="text-sm font-medium text-muted-foreground leading-relaxed">{value}</p>
     </div>
   );
 }
@@ -193,10 +193,10 @@ export default function ComplaintDetailsPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 bg-slate-50 flex items-center justify-center min-h-screen">
+      <div className="flex-1 bg-background flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center">
-          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-sm font-bold text-slate-400">Loading details...</p>
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-sm font-bold text-muted-foreground">Loading details...</p>
         </div>
       </div>
     );
@@ -204,11 +204,11 @@ export default function ComplaintDetailsPage() {
 
   if (!complaint) {
     return (
-      <div className="flex-1 bg-slate-50 flex items-center justify-center min-h-screen">
+      <div className="flex-1 bg-background flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-slate-800 mb-2">Complaint Not Found</h2>
-          <button onClick={() => router.back()} className="text-blue-600 font-bold hover:underline">Go Back</button>
+          <AlertCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
+          <h2 className="text-2xl font-black text-foreground mb-2">Complaint Not Found</h2>
+          <button onClick={() => router.back()} className="text-primary font-bold hover:underline">Go Back</button>
         </div>
       </div>
     );
@@ -221,63 +221,66 @@ export default function ComplaintDetailsPage() {
   const TypeIcon = typeMeta.icon;
 
   return (
-    <div className="flex-1 bg-slate-50 min-h-screen pb-20 md:pb-8">
+    <div className="flex-1 bg-background min-h-screen pb-20 md:pb-8">
       
       {/* Header */}
-      <div className="bg-blue-600 pt-8 pb-12 px-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={() => router.back()}
-            className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center hover:bg-white/30 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5 text-white" />
-          </button>
-          <div>
-            <h1 className="text-xl font-black text-white tracking-tight">Complaint Details</h1>
-            <p className="text-white/80 font-medium text-xs mt-0.5">{complaint.complaint_id}</p>
+      <div className="bg-primary pt-10 pb-16 px-6 md:px-12 md:rounded-b-[60px] rounded-b-[40px] shadow-lg flex items-start justify-between">
+        <div className="max-w-3xl mx-auto w-full flex items-start justify-between">
+          <div className="flex items-start gap-4">
+            <button 
+              onClick={() => router.back()}
+              className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center hover:bg-white/30 transition-colors shadow-sm mt-1"
+            >
+              <ArrowLeft className="w-6 h-6 text-white" />
+            </button>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">Complaint Details</h1>
+              <p className="text-white/80 font-bold text-sm mt-1 bg-white/10 px-3 py-1 rounded-full inline-block">{complaint.complaint_id}</p>
+            </div>
           </div>
+          <div className={`w-4 h-4 rounded-full ${statusCfg.bg} border-[3px] border-white/50 shadow-sm mt-3`}></div>
         </div>
-        <div className={`w-3 h-3 rounded-full ${statusCfg.bg} border-2 border-white/50`}></div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
         
         {/* Hero Card */}
-        <div className={`bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 mb-6 border-t-4 ${statusCfg.border}`}>
-          <div className="flex items-start gap-4 mb-6">
-            <div className={`w-14 h-14 rounded-2xl ${typeMeta.bg} flex items-center justify-center shrink-0`}>
-              <TypeIcon className={`w-7 h-7 ${typeMeta.color}`} />
+        <div className={`bg-card rounded-[2rem] p-6 shadow-md mb-6 border-t-[6px] ${statusCfg.border.replace('border-', 'border-t-')}`}>
+          <div className="flex items-start gap-5 mb-6">
+            <div className={`w-16 h-16 rounded-2xl ${typeMeta.bg} flex items-center justify-center shrink-0 border border-border/50`}>
+              <TypeIcon className={`w-8 h-8 ${typeMeta.color}`} />
             </div>
             <div className="flex-1 mt-1">
-              <h2 className="text-xl font-black text-slate-800 tracking-tight leading-tight mb-1">
+              <h2 className="text-2xl font-black text-foreground tracking-tight leading-tight mb-2">
                 {complaint.title || typeMeta.title}
               </h2>
-              <p className="text-xs font-bold text-slate-400 tracking-widest">{complaint.complaint_id}</p>
+              <p className="text-xs font-bold text-muted-foreground tracking-widest">{complaint.complaint_id}</p>
             </div>
           </div>
           
-          <div className="flex flex-wrap items-center gap-3">
-            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${statusCfg.border} ${statusCfg.bg}`}>
-              <StatusIcon className={`w-4 h-4 ${statusCfg.color}`} />
-              <span className={`text-xs font-bold ${statusCfg.color}`}>{statusCfg.label}</span>
+          <div className="flex flex-wrap items-center gap-3 border-t border-border/50 pt-5 mt-2">
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border ${statusCfg.border} ${statusCfg.bg}`}>
+              <StatusIcon className={`w-5 h-5 ${statusCfg.color}`} />
+              <span className={`text-sm font-bold ${statusCfg.color}`}>{statusCfg.label}</span>
             </div>
-            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${priorityCfg.bg}`}>
-              <AlertCircle className={`w-4 h-4 ${priorityCfg.color}`} />
-              <span className={`text-xs font-bold ${priorityCfg.color}`}>{priorityCfg.label} Priority</span>
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border border-border ${priorityCfg.bg}`}>
+              <AlertCircle className={`w-5 h-5 ${priorityCfg.color}`} />
+              <span className={`text-sm font-bold ${priorityCfg.color}`}>{priorityCfg.label} Priority</span>
             </div>
-            <div className="ml-auto text-xs font-bold text-slate-400">
+            <div className="ml-auto text-sm font-bold text-muted-foreground flex items-center gap-2 bg-muted/50 px-4 py-2 rounded-xl border border-border/50">
+              <Clock className="w-4 h-4" />
               {new Date(complaint.created_at).toLocaleDateString()}
             </div>
           </div>
         </div>
 
         {/* Info Card */}
-        <div className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 mb-6">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-              <Info className="w-4 h-4 text-blue-600" />
+        <div className="bg-card rounded-[2rem] p-6 shadow-sm border border-border mb-6">
+          <div className="flex items-center gap-3 mb-8 pb-4 border-b border-border/50">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Info className="w-5 h-5 text-primary" />
             </div>
-            <h3 className="text-sm font-extrabold text-slate-800">Complaint Info</h3>
+            <h3 className="text-lg font-black text-foreground">Complaint Info</h3>
           </div>
 
           <InfoRow icon={FileText} label="Description" value={complaint.description} />
@@ -290,41 +293,41 @@ export default function ComplaintDetailsPage() {
 
           {(complaint.citizen_note || complaint.worker_note || complaint.inspector_note || complaint.rejection_reason) && (
             <>
-              <div className="h-px bg-slate-100 my-6"></div>
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                  <FileText className="w-4 h-4 text-slate-600" />
+              <div className="h-px bg-border my-8"></div>
+              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border/50">
+                <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-muted-foreground" />
                 </div>
-                <h3 className="text-sm font-extrabold text-slate-800">Notes</h3>
+                <h3 className="text-lg font-black text-foreground">Notes</h3>
               </div>
               
               <NoteCard 
                 icon={User} 
                 label="Citizen Note" 
                 value={complaint.citizen_note} 
-                colorClass="text-blue-600" 
-                borderClass="border-blue-500" 
+                colorClass="text-primary" 
+                borderClass="border-primary" 
               />
               <NoteCard 
                 icon={HardHat} 
                 label="Worker Note" 
                 value={complaint.worker_note} 
-                colorClass="text-purple-600" 
-                borderClass="border-purple-500" 
+                colorClass="text-secondary" 
+                borderClass="border-secondary" 
               />
               <NoteCard 
                 icon={ShieldCheck} 
                 label="Inspector Note" 
                 value={complaint.inspector_note} 
-                colorClass="text-cyan-600" 
-                borderClass="border-cyan-500" 
+                colorClass="text-accent" 
+                borderClass="border-accent" 
               />
               <NoteCard 
                 icon={XCircle} 
                 label="Rejection Reason" 
                 value={complaint.rejection_reason} 
-                colorClass="text-red-600" 
-                borderClass="border-red-500" 
+                colorClass="text-destructive" 
+                borderClass="border-destructive" 
               />
             </>
           )}
@@ -332,12 +335,12 @@ export default function ComplaintDetailsPage() {
 
         {/* Citizen Information */}
         {isPrivileged && complaint.citizen && (
-          <div className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 mb-6">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                <User className="w-4 h-4 text-emerald-600" />
+          <div className="bg-card rounded-[2rem] p-6 shadow-sm border border-border mb-6">
+            <div className="flex items-center gap-3 mb-8 pb-4 border-b border-border/50">
+              <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
+                <User className="w-5 h-5 text-success" />
               </div>
-              <h3 className="text-sm font-extrabold text-slate-800">Citizen Information</h3>
+              <h3 className="text-lg font-black text-foreground">Citizen Information</h3>
             </div>
             <InfoRow icon={User} label="Name" value={complaint.citizen.name} />
             <InfoRow icon={Phone} label="Phone" value={complaint.citizen.phone} />
@@ -347,25 +350,25 @@ export default function ComplaintDetailsPage() {
 
         {/* Activity Timeline */}
         {isPrivileged && complaint.history && complaint.history.length > 0 && (
-          <div className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 mb-6">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
-                <History className="w-4 h-4 text-purple-600" />
+          <div className="bg-card rounded-[2rem] p-6 shadow-sm border border-border mb-6">
+            <div className="flex items-center gap-3 mb-8 pb-4 border-b border-border/50">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <History className="w-5 h-5 text-primary" />
               </div>
-              <h3 className="text-sm font-extrabold text-slate-800">Activity Timeline</h3>
+              <h3 className="text-lg font-black text-foreground">Activity Timeline</h3>
             </div>
-            <div className="relative pl-6 border-l-2 border-slate-100 ml-4 pb-2">
+            <div className="relative pl-8 border-l-2 border-border ml-5 pb-4 mt-4">
               {complaint.history.map((h: any, i: number) => {
                 const s = STATUS_CONFIG[h.status] || STATUS_CONFIG.PENDING;
                 return (
-                  <div key={i} className="mb-6 relative">
-                    <div className={`absolute -left-[31px] w-4 h-4 rounded-full border-4 border-white ${s.bg.replace('bg-', 'bg-').replace('50', '400')}`}></div>
-                    <p className="text-xs font-bold text-slate-800">{s.label}</p>
-                    <p className="text-[10px] font-semibold text-slate-400 mt-0.5">
+                  <div key={i} className="mb-8 relative">
+                    <div className={`absolute -left-[41px] w-5 h-5 rounded-full border-[4px] border-card ${s.bg.replace('bg-', 'bg-').replace('10', '500')} shadow-sm`}></div>
+                    <p className="text-sm font-black text-foreground">{s.label}</p>
+                    <p className="text-xs font-bold text-muted-foreground mt-1">
                       {new Date(h.timestamp || h.created_at).toLocaleString()}
                     </p>
                     {h.remarks && (
-                      <p className="text-sm text-slate-600 mt-2 bg-slate-50 p-3 rounded-xl border border-slate-100">{h.remarks}</p>
+                      <p className="text-sm font-medium text-muted-foreground mt-3 bg-muted/30 p-4 rounded-2xl border border-border/50">{h.remarks}</p>
                     )}
                   </div>
                 );
@@ -379,27 +382,27 @@ export default function ComplaintDetailsPage() {
           <>
             {/* OPEN: Start Work + Reject */}
             {complaint.status === "OPEN" && (
-              <div className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 mb-6">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                    <MoreVertical className="w-4 h-4 text-blue-600" />
+              <div className="bg-card rounded-[2rem] p-6 shadow-sm border border-border mb-6">
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border/50">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <MoreVertical className="w-5 h-5 text-primary" />
                   </div>
-                  <h3 className="text-sm font-extrabold text-slate-800">Complaint Actions</h3>
+                  <h3 className="text-lg font-black text-foreground">Complaint Actions</h3>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-4">
                   <button
                     disabled={updating}
                     onClick={handleStartWork}
-                    className="flex items-center justify-center gap-2 bg-blue-600 text-white rounded-xl py-3 text-sm font-bold shadow-md hover:bg-blue-700 disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl py-4 text-sm font-bold shadow-md shadow-primary/20 disabled:opacity-50 transition-all hover:-translate-y-0.5"
                   >
-                    <Play className="w-4 h-4" /> Start Work
+                    <Play className="w-5 h-5" /> Start Work
                   </button>
                   <button
                     disabled={updating}
                     onClick={() => setShowRejectModal(true)}
-                    className="flex items-center justify-center gap-2 bg-red-600 text-white rounded-xl py-3 text-sm font-bold shadow-md hover:bg-red-700 disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-2xl py-4 text-sm font-bold shadow-md shadow-destructive/20 disabled:opacity-50 transition-all hover:-translate-y-0.5"
                   >
-                    <X className="w-4 h-4" /> Reject Complaint
+                    <X className="w-5 h-5" /> Reject
                   </button>
                 </div>
               </div>
@@ -407,19 +410,19 @@ export default function ComplaintDetailsPage() {
 
             {/* IN_PROGRESS: Resolve */}
             {complaint.status === "IN_PROGRESS" && (
-              <div className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100 mb-6">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <div className="bg-card rounded-[2rem] p-6 shadow-sm border border-border mb-6">
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border/50">
+                  <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
+                    <CheckCircle2 className="w-5 h-5 text-success" />
                   </div>
-                  <h3 className="text-sm font-extrabold text-slate-800">Complaint Actions</h3>
+                  <h3 className="text-lg font-black text-foreground">Complaint Actions</h3>
                 </div>
                 <button
                   disabled={updating}
                   onClick={() => setShowResolveModal(true)}
-                  className="w-full flex items-center justify-center gap-2 bg-emerald-600 text-white rounded-xl py-3 text-sm font-bold shadow-md hover:bg-emerald-700 disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 bg-success hover:bg-success/90 text-success-foreground rounded-2xl py-4 text-sm font-bold shadow-md shadow-success/20 disabled:opacity-50 transition-all hover:-translate-y-0.5"
                 >
-                  <Check className="w-4 h-4" /> Resolve Complaint
+                  <Check className="w-5 h-5" /> Resolve Complaint
                 </button>
               </div>
             )}
@@ -428,18 +431,18 @@ export default function ComplaintDetailsPage() {
 
         {/* Notes Modal */}
         {showNotesModal && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
-              <h3 className="text-lg font-black text-slate-800 mb-4">Add Note</h3>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-card rounded-[2rem] p-8 w-full max-w-md shadow-2xl border border-border animate-in fade-in zoom-in duration-200">
+              <h3 className="text-xl font-black text-foreground mb-6">Add Note</h3>
               <textarea
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
-                className="w-full h-32 bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-semibold text-slate-700 mb-4 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full h-32 bg-muted/30 border-2 border-border rounded-2xl p-5 text-sm font-medium text-foreground mb-6 focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10 outline-none transition-all resize-none"
                 placeholder="Type your observations..."
               />
-              <div className="flex gap-3">
-                <button onClick={() => setShowNotesModal(false)} className="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200">Cancel</button>
-                <button disabled={updating || !newNote} onClick={addNote} className="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 disabled:opacity-50">Save Note</button>
+              <div className="flex gap-4">
+                <button onClick={() => setShowNotesModal(false)} className="flex-1 bg-muted hover:bg-muted/80 text-foreground font-bold py-3.5 rounded-2xl transition-colors">Cancel</button>
+                <button disabled={updating || !newNote} onClick={addNote} className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3.5 rounded-2xl shadow-md shadow-primary/20 disabled:opacity-50 transition-colors">Save Note</button>
               </div>
             </div>
           </div>
@@ -447,31 +450,31 @@ export default function ComplaintDetailsPage() {
 
         {/* Reject Confirmation Modal */}
         {showRejectModal && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
-                  <XCircle className="w-5 h-5 text-red-600" />
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-card rounded-[2rem] p-8 w-full max-w-md shadow-2xl border border-border animate-in fade-in zoom-in duration-200">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center shrink-0">
+                  <XCircle className="w-6 h-6 text-destructive" />
                 </div>
-                <h3 className="text-lg font-black text-slate-800">Confirm Complaint Rejection</h3>
+                <h3 className="text-xl font-black text-foreground">Confirm Rejection</h3>
               </div>
-              <p className="text-sm font-medium text-slate-600 leading-relaxed mb-6">
+              <p className="text-sm font-medium text-muted-foreground leading-relaxed mb-8">
                 Have you physically inspected the reported location and confirmed that this complaint should be rejected?
               </p>
-              <div className="flex gap-3">
+              <div className="flex gap-4">
                 <button
                   disabled={updating}
                   onClick={() => setShowRejectModal(false)}
-                  className="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200 disabled:opacity-50"
+                  className="flex-1 bg-muted hover:bg-muted/80 text-foreground font-bold py-3.5 rounded-2xl disabled:opacity-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   disabled={updating}
                   onClick={handleRejectConfirm}
-                  className="flex-1 bg-red-600 text-white font-bold py-3 rounded-xl hover:bg-red-700 disabled:opacity-50"
+                  className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground font-bold py-3.5 rounded-2xl shadow-md shadow-destructive/20 disabled:opacity-50 transition-colors"
                 >
-                  Yes, Reject Complaint
+                  Reject
                 </button>
               </div>
             </div>
@@ -480,31 +483,31 @@ export default function ComplaintDetailsPage() {
 
         {/* Resolve Confirmation Modal */}
         {showResolveModal && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-card rounded-[2rem] p-8 w-full max-w-md shadow-2xl border border-border animate-in fade-in zoom-in duration-200">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="w-6 h-6 text-success" />
                 </div>
-                <h3 className="text-lg font-black text-slate-800">Mark Complaint as Resolved</h3>
+                <h3 className="text-xl font-black text-foreground">Mark Resolved</h3>
               </div>
-              <p className="text-sm font-medium text-slate-600 leading-relaxed mb-6">
+              <p className="text-sm font-medium text-muted-foreground leading-relaxed mb-8">
                 Have you verified that the issue has been successfully resolved?
               </p>
-              <div className="flex gap-3">
+              <div className="flex gap-4">
                 <button
                   disabled={updating}
                   onClick={() => setShowResolveModal(false)}
-                  className="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200 disabled:opacity-50"
+                  className="flex-1 bg-muted hover:bg-muted/80 text-foreground font-bold py-3.5 rounded-2xl disabled:opacity-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   disabled={updating}
                   onClick={handleResolveConfirm}
-                  className="flex-1 bg-emerald-600 text-white font-bold py-3 rounded-xl hover:bg-emerald-700 disabled:opacity-50"
+                  className="flex-1 bg-success hover:bg-success/90 text-success-foreground font-bold py-3.5 rounded-2xl shadow-md shadow-success/20 disabled:opacity-50 transition-colors"
                 >
-                  Mark Resolved
+                  Confirm
                 </button>
               </div>
             </div>

@@ -25,22 +25,22 @@ import {
 } from "lucide-react";
 
 const COMPLAINT_TYPES = [
-  { value: "GARBAGE",      label: "Garbage / Waste",      icon: Trash2,    color: "text-cyan-600", bg: "bg-cyan-100" },
-  { value: "ROAD_DAMAGE",  label: "Road Damage",          icon: Map,       color: "text-red-600",  bg: "bg-red-100" },
-  { value: "POTHOLE",      label: "Pothole",              icon: Map,       color: "text-red-600",  bg: "bg-red-100" },
-  { value: "STREETLIGHT",  label: "Street Light",         icon: Lightbulb, color: "text-amber-600", bg: "bg-amber-100" },
-  { value: "WATER_SUPPLY", label: "Water Supply",         icon: Activity,  color: "text-blue-600", bg: "bg-blue-100" },
-  { value: "DRAINAGE",     label: "Drainage Issue",       icon: Wrench,    color: "text-cyan-600", bg: "bg-cyan-100" },
-  { value: "SANITATION",   label: "Sanitation",           icon: ClipboardList, color: "text-emerald-600", bg: "bg-emerald-100" },
-  { value: "TREE_CUTTING", label: "Tree / Fallen Branch", icon: TreePine,  color: "text-emerald-600", bg: "bg-emerald-100" },
-  { value: "CONSTRUCTION", label: "Construction Block",   icon: Wrench,    color: "text-amber-600", bg: "bg-amber-100" },
-  { value: "OTHER",        label: "Other Issue",          icon: AlertCircle, color: "text-slate-600", bg: "bg-slate-100" },
+  { value: "GARBAGE",      label: "Garbage / Waste",      icon: Trash2,    color: "text-secondary", bg: "bg-secondary/10" },
+  { value: "ROAD_DAMAGE",  label: "Road Damage",          icon: Map,       color: "text-destructive",  bg: "bg-destructive/10" },
+  { value: "POTHOLE",      label: "Pothole",              icon: Map,       color: "text-destructive",  bg: "bg-destructive/10" },
+  { value: "STREETLIGHT",  label: "Street Light",         icon: Lightbulb, color: "text-primary", bg: "bg-primary/10" },
+  { value: "WATER_SUPPLY", label: "Water Supply",         icon: Activity,  color: "text-primary", bg: "bg-primary/10" },
+  { value: "DRAINAGE",     label: "Drainage Issue",       icon: Wrench,    color: "text-secondary", bg: "bg-secondary/10" },
+  { value: "SANITATION",   label: "Sanitation",           icon: ClipboardList, color: "text-secondary", bg: "bg-secondary/10" },
+  { value: "TREE_CUTTING", label: "Tree / Fallen Branch", icon: TreePine,  color: "text-success", bg: "bg-success/10" },
+  { value: "CONSTRUCTION", label: "Construction Block",   icon: Wrench,    color: "text-accent", bg: "bg-accent/10" },
+  { value: "OTHER",        label: "Other Issue",          icon: AlertCircle, color: "text-destructive", bg: "bg-destructive/10" },
 ];
 
 const PRIORITIES = [
-  { value: "LOW",    label: "Low",    color: "text-emerald-600", bg: "bg-emerald-100", border: "border-emerald-500", icon: CheckCircle2 },
-  { value: "MEDIUM", label: "Medium", color: "text-amber-600", bg: "bg-amber-100", border: "border-amber-500", icon: AlertCircle },
-  { value: "HIGH",   label: "High",   color: "text-red-600", bg: "bg-red-100", border: "border-red-500", icon: AlertCircle },
+  { value: "LOW",    label: "Low",    color: "text-success", bg: "bg-success/10", border: "border-success", icon: CheckCircle2 },
+  { value: "MEDIUM", label: "Medium", color: "text-accent", bg: "bg-accent/10", border: "border-accent", icon: AlertCircle },
+  { value: "HIGH",   label: "High",   color: "text-destructive", bg: "bg-destructive/10", border: "border-destructive", icon: AlertCircle },
 ];
 
 export default function CreateComplaintPage() {
@@ -138,38 +138,38 @@ export default function CreateComplaintPage() {
     const status = createdComplaint.status || "OPEN";
     
     return (
-      <div className="flex-1 bg-slate-50 flex items-center justify-center p-6 animate-in fade-in zoom-in duration-500">
-        <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl shadow-emerald-500/10 border border-emerald-100">
-          <div className="w-24 h-24 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="flex-1 bg-background flex items-center justify-center p-6 animate-in fade-in zoom-in duration-500 min-h-[calc(100vh-100px)]">
+        <div className="bg-card rounded-3xl p-8 max-w-md w-full text-center shadow-xl shadow-success/10 border border-success/20">
+          <div className="w-24 h-24 bg-success/10 text-success rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 className="w-12 h-12" />
           </div>
-          <h2 className="text-2xl font-black text-slate-800 mb-2">Complaint Submitted!</h2>
+          <h2 className="text-2xl font-black text-foreground mb-2">Complaint Submitted!</h2>
           
-          <div className="bg-slate-50 rounded-2xl p-4 mb-6 text-left border border-slate-100">
-            <div className="flex justify-between items-center mb-2 pb-2 border-b border-slate-200">
-              <span className="text-xs font-bold text-slate-500">Complaint ID</span>
-              <span className="text-sm font-extrabold text-slate-800">{complaintId}</span>
+          <div className="bg-muted/30 rounded-2xl p-4 mb-6 text-left border border-border">
+            <div className="flex justify-between items-center mb-3 pb-3 border-b border-border/50">
+              <span className="text-xs font-bold text-muted-foreground">Complaint ID</span>
+              <span className="text-sm font-extrabold text-foreground">{complaintId}</span>
             </div>
-            <div className="flex justify-between items-center mb-2 pb-2 border-b border-slate-200">
-              <span className="text-xs font-bold text-slate-500">Status</span>
-              <span className="text-xs font-black text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">{status}</span>
+            <div className="flex justify-between items-center mb-3 pb-3 border-b border-border/50">
+              <span className="text-xs font-bold text-muted-foreground">Status</span>
+              <span className="text-xs font-black text-accent bg-accent/10 px-3 py-1 rounded-full">{status}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-slate-500">Est. Resolution</span>
-              <span className="text-sm font-bold text-slate-800">48 hours</span>
+              <span className="text-xs font-bold text-muted-foreground">Est. Resolution</span>
+              <span className="text-sm font-bold text-foreground">48 hours</span>
             </div>
           </div>
 
           <div className="flex gap-4 mt-8">
             <button
               onClick={() => router.push("/dashboard")}
-              className="flex-1 py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors"
+              className="flex-1 py-3.5 px-4 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-2xl transition-colors"
             >
               Done
             </button>
             <button
               onClick={() => router.push(`/complaints/${createdComplaint._id || createdComplaint.id}`)}
-              className="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors"
+              className="flex-1 py-3.5 px-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-2xl transition-colors shadow-md shadow-primary/20"
             >
               View Complaint
             </button>
@@ -180,60 +180,63 @@ export default function CreateComplaintPage() {
   }
 
   return (
-    <div className="flex-1 bg-slate-50">
-      <div className="bg-blue-600 pt-8 pb-12 px-6">
-        <h1 className="text-2xl font-black text-white tracking-tight">Raise a Complaint</h1>
-        <p className="text-white/80 font-medium mt-1">Help us fix your community</p>
+    <div className="flex-1 bg-background relative pb-20 md:pb-8">
+      {/* Header */}
+      <div className="bg-primary pt-12 pb-24 px-6 md:px-12 md:rounded-b-[60px] rounded-b-[40px] shadow-lg">
+        <div className="max-w-3xl mx-auto">
+           <h1 className="text-3xl font-black text-white tracking-tight">Raise a Complaint</h1>
+           <p className="text-white/80 font-semibold mt-2 text-sm">Help us fix your community by reporting an issue.</p>
+        </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 pb-20">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10 pb-12">
         <form onSubmit={handleSubmit} className="space-y-6">
           
           {/* Section 1: What's the issue */}
-          <div className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-                <AlertCircle className="w-5 h-5" />
+          <div className="bg-card rounded-[2rem] p-6 shadow-sm border border-border">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
+                <AlertCircle className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="text-sm font-extrabold text-slate-800">What&apos;s the issue?</h2>
-                <p className="text-xs font-semibold text-slate-500">Type, description and priority</p>
+                <h2 className="text-lg font-bold text-foreground">What&apos;s the issue?</h2>
+                <p className="text-xs font-semibold text-muted-foreground">Type, description and priority</p>
               </div>
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-6">
               <div>
-                <label className="block text-xs font-bold text-slate-500 tracking-wider mb-2 uppercase">Complaint Type</label>
+                <label className="block text-xs font-bold text-muted-foreground tracking-wider mb-2 uppercase">Complaint Type</label>
                 <div className="relative">
                   <select
                     value={form.complaint_type}
                     onChange={(e) => updateField("complaint_type", e.target.value)}
-                    className={`w-full appearance-none bg-slate-50 border-2 ${errors.complaint_type ? 'border-red-500' : 'border-slate-100'} rounded-xl px-4 py-3.5 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 transition-colors`}
+                    className={`w-full appearance-none bg-muted/30 border-2 ${errors.complaint_type ? 'border-destructive' : 'border-border'} rounded-2xl px-5 py-4 text-sm font-bold text-foreground outline-none focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10 transition-all duration-200`}
                   >
                     <option value="" disabled>Select a category</option>
                     {COMPLAINT_TYPES.map(t => (
                       <option key={t.value} value={t.value}>{t.label}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                  <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
                 </div>
-                {errors.complaint_type && <p className="text-red-500 text-xs font-bold mt-1.5 ml-1">{errors.complaint_type}</p>}
+                {errors.complaint_type && <p className="text-destructive text-xs font-bold mt-1.5 ml-1">{errors.complaint_type}</p>}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-500 tracking-wider mb-2 uppercase">Description</label>
+                <label className="block text-xs font-bold text-muted-foreground tracking-wider mb-2 uppercase">Description</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => updateField("description", e.target.value)}
                   placeholder="Describe the issue clearly (min 10 characters)"
                   rows={4}
-                  className={`w-full bg-slate-50 border-2 ${errors.description ? 'border-red-500' : 'border-slate-100'} rounded-xl px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 transition-colors resize-none`}
+                  className={`w-full bg-muted/30 border-2 ${errors.description ? 'border-destructive' : 'border-border'} rounded-2xl px-5 py-4 text-sm font-medium text-foreground outline-none focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10 transition-all duration-200 resize-none`}
                 />
-                {errors.description && <p className="text-red-500 text-xs font-bold mt-1.5 ml-1">{errors.description}</p>}
+                {errors.description && <p className="text-destructive text-xs font-bold mt-1.5 ml-1">{errors.description}</p>}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-500 tracking-wider mb-2 uppercase">Priority</label>
+                <label className="block text-xs font-bold text-muted-foreground tracking-wider mb-3 uppercase">Priority</label>
                 <div className="flex gap-3">
                   {PRIORITIES.map(p => {
                     const isSelected = form.priority === p.value;
@@ -243,11 +246,11 @@ export default function CreateComplaintPage() {
                         key={p.value}
                         type="button"
                         onClick={() => updateField("priority", p.value)}
-                        className={`flex-1 flex flex-col items-center gap-2 py-3 border-2 rounded-xl transition-all ${
-                          isSelected ? `${p.bg} ${p.border} ${p.color}` : 'border-slate-100 bg-slate-50 text-slate-400 hover:bg-slate-100'
+                        className={`flex-1 flex flex-col items-center gap-2 py-4 border-2 rounded-2xl transition-all duration-200 ${
+                          isSelected ? `${p.bg} ${p.border} ${p.color} ring-4 ring-${p.color.split('-')[1]}/10` : 'border-border bg-card text-muted-foreground hover:bg-muted/50'
                         }`}
                       >
-                        <Icon className="w-5 h-5" />
+                        <Icon className="w-6 h-6" />
                         <span className="text-xs font-extrabold">{p.label}</span>
                       </button>
                     );
@@ -258,103 +261,103 @@ export default function CreateComplaintPage() {
           </div>
 
           {/* Section 2: Where is it */}
-          <div className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-                <MapPin className="w-5 h-5" />
+          <div className="bg-card rounded-[2rem] p-6 shadow-sm border border-border">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
+                <MapPin className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="text-sm font-extrabold text-slate-800">Where is it?</h2>
-                <p className="text-xs font-semibold text-slate-500">Ward, address & GPS location</p>
+                <h2 className="text-lg font-bold text-foreground">Where is it?</h2>
+                <p className="text-xs font-semibold text-muted-foreground">Ward, address & GPS location</p>
               </div>
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-6">
               <div>
-                <label className="block text-xs font-bold text-slate-500 tracking-wider mb-2 uppercase">Ward</label>
+                <label className="block text-xs font-bold text-muted-foreground tracking-wider mb-2 uppercase">Ward</label>
                 <div className="relative">
                   <select
                     value={form.ward_id}
                     onChange={(e) => updateField("ward_id", e.target.value)}
                     disabled={wardsLoading}
-                    className={`w-full appearance-none bg-slate-50 border-2 ${errors.ward_id ? 'border-red-500' : 'border-slate-100'} rounded-xl px-4 py-3.5 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 transition-colors disabled:opacity-50`}
+                    className={`w-full appearance-none bg-muted/30 border-2 ${errors.ward_id ? 'border-destructive' : 'border-border'} rounded-2xl px-5 py-4 text-sm font-bold text-foreground outline-none focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10 transition-all duration-200 disabled:opacity-50`}
                   >
                     <option value="" disabled>{wardsLoading ? "Loading wards..." : "Select your ward"}</option>
                     {wards.map((w: any) => (
                       <option key={w._id} value={w._id}>{w.ward_name}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                  <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
                 </div>
-                {errors.ward_id && <p className="text-red-500 text-xs font-bold mt-1.5 ml-1">{errors.ward_id}</p>}
+                {errors.ward_id && <p className="text-destructive text-xs font-bold mt-1.5 ml-1">{errors.ward_id}</p>}
               </div>
 
               <button
                 type="button"
                 onClick={handleGetLocation}
                 disabled={gpsLoading}
-                className="w-full flex items-center justify-center gap-2 py-3.5 bg-blue-50 text-blue-600 hover:bg-blue-100 border-2 border-blue-200 rounded-xl transition-colors font-bold text-sm"
+                className="w-full flex items-center justify-center gap-2 py-4 bg-primary/10 text-primary hover:bg-primary/20 border-2 border-primary/20 rounded-2xl transition-all duration-200 font-bold text-sm"
               >
-                <Navigation className={`w-4 h-4 ${gpsLoading ? 'animate-spin' : ''}`} />
+                <Navigation className={`w-5 h-5 ${gpsLoading ? 'animate-spin' : ''}`} />
                 {gpsLoading ? "Getting location..." : "Use my current location"}
               </button>
 
               {(form.latitude || form.longitude) && (
-                <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl p-3">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-                  <span className="flex-1 text-xs font-bold text-emerald-800 truncate">
+                <div className="flex items-center gap-3 bg-success/10 border border-success/30 rounded-2xl p-4">
+                  <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
+                  <span className="flex-1 text-sm font-bold text-success truncate">
                     {form.latitude}, {form.longitude}
                   </span>
                   <button
                     type="button"
                     onClick={() => { updateField("latitude", ""); updateField("longitude", ""); }}
-                    className="p-1 hover:bg-emerald-100 rounded-lg text-emerald-600"
+                    className="p-1 hover:bg-success/20 rounded-lg text-success"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-5 h-5" />
                   </button>
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-bold text-slate-500 tracking-wider mb-2 uppercase">Address / Landmark</label>
+                <label className="block text-xs font-bold text-muted-foreground tracking-wider mb-2 uppercase">Address / Landmark</label>
                 <input
                   type="text"
                   value={form.address}
                   onChange={(e) => updateField("address", e.target.value)}
                   placeholder="e.g. Near post office, Main Road"
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 transition-colors"
+                  className="w-full bg-muted/30 border-2 border-border rounded-2xl px-5 py-4 text-sm font-medium text-foreground outline-none focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10 transition-all duration-200"
                 />
               </div>
             </div>
           </div>
 
           {/* Section 3: Additional info */}
-          <div className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-                <FileText className="w-5 h-5" />
+          <div className="bg-card rounded-[2rem] p-6 shadow-sm border border-border">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
+                <FileText className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="text-sm font-extrabold text-slate-800">Additional info</h2>
-                <p className="text-xs font-semibold text-slate-500">Optional — any extra context</p>
+                <h2 className="text-lg font-bold text-foreground">Additional info</h2>
+                <p className="text-xs font-semibold text-muted-foreground">Optional — any extra context</p>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 tracking-wider mb-2 uppercase">Citizen Note</label>
+              <label className="block text-xs font-bold text-muted-foreground tracking-wider mb-2 uppercase">Citizen Note</label>
               <textarea
                 value={form.citizen_note}
                 onChange={(e) => updateField("citizen_note", e.target.value)}
                 placeholder="Anything else we should know?"
                 rows={3}
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 transition-colors resize-none"
+                className="w-full bg-muted/30 border-2 border-border rounded-2xl px-5 py-4 text-sm font-medium text-foreground outline-none focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10 transition-all duration-200 resize-none"
               />
             </div>
           </div>
 
           {serverError && (
-            <div className="bg-red-50 border border-red-200 text-red-600 text-sm font-bold p-4 rounded-xl flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 shrink-0" />
+            <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm font-bold p-5 rounded-2xl flex items-center gap-3">
+              <AlertCircle className="w-6 h-6 shrink-0" />
               {serverError}
             </div>
           )}
@@ -362,7 +365,7 @@ export default function CreateComplaintPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-70 text-white rounded-xl font-black tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30 transition-all active:scale-[0.98]"
+            className="w-full py-4 bg-primary hover:bg-primary/90 disabled:opacity-70 text-primary-foreground rounded-2xl font-black text-sm tracking-wide flex items-center justify-center gap-2 shadow-md shadow-primary/20 transition-all duration-200 hover:-translate-y-0.5"
           >
             {loading ? (
               <span>Submitting...</span>

@@ -16,8 +16,14 @@ class ComplaintStatus(str, Enum):
     OPEN = "OPEN"
     WORKING = "WORKING"
     APPROVAL = "APPROVAL"
+    ASSIGNED = "ASSIGNED"
+    ACCEPTED = "ACCEPTED"
+    IN_PROGRESS = "IN_PROGRESS"
+    FIELD_VISIT = "FIELD_VISIT"
+    RESOLVED = "RESOLVED"
     CLOSED = "CLOSED"
     REJECTED = "REJECTED"
+    PENDING = "PENDING"
 
 
 class ComplaintType(str, Enum):

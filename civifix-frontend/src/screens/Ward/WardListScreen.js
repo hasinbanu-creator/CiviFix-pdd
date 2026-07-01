@@ -34,8 +34,15 @@ const WardListScreen = ({ navigation }) => {
   const loadWards = async () => {
     try {
       setError("");
-      const res = await authService.getWards({ page: 1, limit: 100 });
-      const wardsData = res?.wards ?? res?.data ?? [];
+      let wardsData = [];
+      if (user?.role === "INSPECTOR") {
+        const res = await authService.getInspectorWard();
+        const wardInfo = res?.ward_info ?? res?.data;
+        if (wardInfo) wardsData = Array.isArray(wardInfo) ? wardInfo : [wardInfo];
+      } else {
+        const res = await authService.getWards({ page: 1, limit: 100 });
+        wardsData = res?.wards ?? res?.data ?? [];
+      }
       setWards(Array.isArray(wardsData) ? wardsData : []);
     } catch (err) {
       setError(getErrorMessage(err, "Failed to load wards"));

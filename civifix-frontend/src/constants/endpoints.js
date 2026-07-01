@@ -1,5 +1,6 @@
 import { Platform } from "react-native";
 import Constants from "expo-constants";
+import * as Device from "expo-device";
 
 const DEFAULT_API_URL = "http://localhost:8000/api/v1"
 
@@ -21,13 +22,15 @@ const resolveApiUrl = () => {
     return configuredUrl;
   }
 
+  // If we are on an Android emulator, we should use 10.0.2.2 for localhost
+  if (Platform.OS === "android" && !Device.isDevice) {
+    return configuredUrl.replace(/localhost|127\.0\.0\.1/, "10.0.2.2");
+  }
+
+  // If we are on a physical device, we should try to use the metro host (LAN IP)
   const metroHost = getMetroHost();
   if (metroHost) {
     return configuredUrl.replace(/localhost|127\.0\.0\.1/, metroHost);
-  }
-
-  if (Platform.OS === "android") {
-    return configuredUrl.replace(/localhost|127\.0\.0\.1/, "10.0.2.2");
   }
 
   return configuredUrl;
@@ -48,10 +51,21 @@ export const ENDPOINTS = {
   GET_PROFILE: "/auth/me",
   UPDATE_PROFILE: "/auth/me",
 
+  // Notification endpoints
+  GET_NOTIFICATIONS: "/notifications",
+  MARK_NOTIFICATION_READ: (id) => `/notifications/${id}/read`,
+  MARK_ALL_NOTIFICATIONS_READ: "/notifications/read-all",
+
+  // Uploads
+  UPLOAD_IMAGES: "/upload",
+
   // Complaints endpoints
   GET_COMPLAINTS: "/complaints/my/dashboard",
   CREATE_COMPLAINT: "/complaints",
   GET_COMPLAINT: (id) => `/complaints/${id}`,
+  SAVE_COMPLAINT_DRAFT: "/complaints/draft",
+  SUBMIT_FEEDBACK: (id) => `/complaints/${id}/feedback`,
+  REOPEN_COMPLAINT: (id) => `/complaints/${id}/reopen`,
 
   // Ward/admin endpoints
   GET_WARDS_BY_DISTRICT: (districtId) => `/wards/district/${districtId}`,
@@ -65,9 +79,31 @@ export const ENDPOINTS = {
   ASSIGN_INSPECTOR_TO_WARD: (wardId) => `/wards/${wardId}/assign-inspector`,
 
   // Dashboard role-specific
-  GET_INSPECTOR_DASHBOARD: "/dashboard/inspector/dashboard",
+  GET_SUPER_ADMIN_DASHBOARD: "/admin/stats",
+  GET_INSPECTOR_DASHBOARD: "/inspector/dashboard",
   GET_DISTRICT_ADMIN_DASHBOARD: "/dashboard/district-admin/dashboard",
   GET_WORKER_DASHBOARD: "/dashboard/worker/dashboard",
+
+  // Admin Specific
+  ADMIN_COMPLAINTS: "/admin/complaints",
+  ADMIN_ASSIGN_COMPLAINT: (id) => `/admin/complaints/${id}/assign`,
+  ADMIN_EXPORT_COMPLAINTS: "/admin/complaints/export",
+  
+  ADMIN_USERS: "/admin/users",
+  ADMIN_EDIT_USER: (id) => `/admin/users/${id}`,
+  ADMIN_SUSPEND_USER: (id) => `/admin/users/${id}/suspend`,
+  ADMIN_ACTIVATE_USER: (id) => `/admin/users/${id}/activate`,
+  ADMIN_ROLE_USER: (id) => `/admin/users/${id}/role`,
+
+  ADMIN_SLA: "/admin/settings/sla",
+  ADMIN_APP_SETTINGS: "/admin/settings/app",
+
+  // Inspector specific endpoints
+  INSPECTOR_COMPLAINTS: "/inspector/complaints",
+  UPDATE_COMPLAINT_STATUS: (id) => `/inspector/complaints/${id}/status`,
+  ADD_INSPECTOR_NOTE: (id) => `/inspector/complaints/${id}/notes`,
+  UPDATE_CHECKLIST: (id) => `/inspector/complaints/${id}/checklist`,
+  RESOLVE_COMPLAINT: (id) => `/inspector/complaints/${id}/resolve`,
 };
 
 export default ENDPOINTS;

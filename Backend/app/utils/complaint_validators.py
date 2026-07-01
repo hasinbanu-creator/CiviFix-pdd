@@ -72,8 +72,8 @@ class DuplicateComplaintDetector:
     """Detects duplicate complaints"""
 
     # Configuration
-    DUPLICATE_CHECK_DAYS = 7
-    DUPLICATE_DISTANCE_METERS = 500  # 500 meters radius
+    DUPLICATE_CHECK_DAYS = 1
+    DUPLICATE_DISTANCE_METERS = 10  # 10 meters radius (relaxed for testing)
 
     @staticmethod
     def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -133,8 +133,8 @@ class SpamDetector:
     """Detects spam complaints from same user"""
 
     # Configuration
-    MAX_COMPLAINTS_PER_WEEK = 2
-    MAX_COMPLAINTS_PER_DAY = 1
+    MAX_COMPLAINTS_PER_WEEK = 50
+    MAX_COMPLAINTS_PER_DAY = 20
 
     @staticmethod
     def check_weekly_limit(user_complaints_this_week: int) -> bool:

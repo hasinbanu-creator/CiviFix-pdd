@@ -7,7 +7,8 @@ from app.schemas.auth_schema import (
     VerifyOTPSchema,
     RefreshTokenSchema,
     TokenResponseSchema,
-    LogoutSchema
+    LogoutSchema,
+    UpdateProfileSchema
 )
 from app.schemas.common_schema import SuccessSchema
 from app.core.response import ResponseHandler
@@ -24,6 +25,7 @@ from app.core.exceptions import (
 from app.services.auth_service import AuthService
 from app.services.email_service import EmailService
 from app.dependencies.auth_dependency import get_current_user
+from app.repositories.user_repository import UserRepository
 
 router = APIRouter()
 
@@ -58,7 +60,12 @@ async def register(payload: RegisterSchema):
         
         # Send OTP email
         otp = result.get("otp")
-        await EmailService.send_otp_email(payload.email, otp)
+        email_sent = await EmailService.send_otp_email(payload.email, otp)
+        if not email_sent:
+            return ResponseHandler.error(
+                message="Failed to send OTP email. Please try again.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
         
         return ResponseHandler.success(
             message="Registration successful. OTP sent to email.",
@@ -165,7 +172,12 @@ async def login(payload: LoginSchema):
         
         # Send OTP email
         otp = result.get("otp")
-        await EmailService.send_login_otp_email(payload.email, otp)
+        email_sent = await EmailService.send_login_otp_email(payload.email, otp)
+        if not email_sent:
+            return ResponseHandler.error(
+                message="Failed to send login OTP email. Please try again.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
         
         return ResponseHandler.success(
             message="Login OTP sent to registered email",
@@ -355,3 +367,57 @@ async def get_current_user_info(
         message="Current user info",
         data=current_user
     )
+
+
+@router.put(
+    "/me",
+    summary="Update current user profile",
+    responses={
+        200: {"description": "Profile updated successfully"},
+        400: {"description": "Validation error"},
+        401: {"description": "Unauthorized"}
+    }
+)
+async def update_current_user_info(
+    payload: UpdateProfileSchema,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """
+    Update information for the currently authenticated user.
+    """
+    try:
+        user_id = current_user.get("user_id")
+        
+        # Filter out None values to only update provided fields
+        update_data = {k: v for k, v in payload.dict().items() if v is not None}
+        
+        if not update_data:
+            return ResponseHandler.success(
+                message="No changes provided",
+                data=current_user
+            )
+            
+        success = await UserRepository.update_user(user_id, update_data)
+        
+        if not success:
+            return ResponseHandler.error(
+                message="Failed to update profile",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            
+        # Get updated user data
+        updated_user = await UserRepository.get_by_id(user_id)
+        if updated_user and "_id" in updated_user:
+            updated_user["_id"] = str(updated_user["_id"])
+            
+        return ResponseHandler.success(
+            message="Profile updated successfully",
+            data=updated_user
+        )
+        
+    except Exception as e:
+        return ResponseHandler.error(
+            message="Profile update failed",
+            errors=str(e),
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

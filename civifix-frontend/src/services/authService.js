@@ -42,6 +42,11 @@ export const authService = {
     return session;
   },
 
+  forgotPassword: async (email) => {
+    const response = await api.post("/auth/forgot-password", { email });
+    return unwrapResponse(response);
+  },
+
   logout: async () => {
     try {
       await api.post(ENDPOINTS.LOGOUT);
@@ -72,6 +77,15 @@ export const authService = {
 
   getComplaint: async (id) => {
     const response = await api.get(ENDPOINTS.GET_COMPLAINT(id));
+    return unwrapResponse(response);
+  },
+
+  uploadImages: async (formData) => {
+    const response = await api.post(ENDPOINTS.UPLOAD_IMAGES, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return unwrapResponse(response);
   },
 
@@ -175,7 +189,6 @@ export const authService = {
     const res = await api.get("/dashboard/inspector/dashboard");
     return unwrapResponse(res);
   },
-
   getDistrictAdminDashboard: async () => {
     const res = await api.get("/dashboard/district-admin/dashboard");
     return unwrapResponse(res);
@@ -185,6 +198,54 @@ export const authService = {
     const res = await api.get("/dashboard/worker/dashboard");
     return unwrapResponse(res);
   },
-}; // ← added missing closing brace
+
+  getInspectorDashboard: async () => {
+    const response = await api.get(ENDPOINTS.GET_INSPECTOR_DASHBOARD);
+    return unwrapResponse(response);
+  },
+
+  // --- Notifications ---
+  getNotifications: async (params) => {
+    const response = await api.get(ENDPOINTS.GET_NOTIFICATIONS, { params });
+    return unwrapResponse(response);
+  },
+
+  markNotificationRead: async (id) => {
+    const response = await api.put(ENDPOINTS.MARK_NOTIFICATION_READ(id));
+    return unwrapResponse(response);
+  },
+
+  markAllNotificationsRead: async () => {
+    const response = await api.put(ENDPOINTS.MARK_ALL_NOTIFICATIONS_READ);
+    return unwrapResponse(response);
+  },
+
+  // --- Complaints Additions ---
+  saveComplaintDraft: async (complaintData) => {
+    const response = await api.post(ENDPOINTS.SAVE_COMPLAINT_DRAFT, complaintData);
+    return unwrapResponse(response);
+  },
+
+  submitFeedback: async (id, data) => {
+    const response = await api.put(ENDPOINTS.SUBMIT_FEEDBACK(id), null, { params: data });
+    return unwrapResponse(response);
+  },
+
+  reopenComplaint: async (id, reason) => {
+    const response = await api.put(ENDPOINTS.REOPEN_COMPLAINT(id), null, { params: { reason } });
+    return unwrapResponse(response);
+  },
+
+  // --- Uploads ---
+  uploadImages: async (formData) => {
+    // Requires content-type multipart/form-data
+    const response = await api.post(ENDPOINTS.UPLOAD_IMAGES, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return unwrapResponse(response);
+  },
+};
 
 export default authService;

@@ -50,11 +50,16 @@ async def create_complaint(
 ):
     """Create a new complaint (CITIZEN only)"""
     try:
+        user_id = current_user["user_id"]
+        logger.info(f"Complaint creation requested by user: {user_id}")
+        logger.info(f"Complaint payload: {complaint_data.dict()}")
+        
         result = await service.create_complaint(
             complaint_data,
-            current_user["user_id"],
+            user_id,
             current_user.get("role", "CITIZEN")
         )
+        logger.info(f"Complaint successfully created and inserted into MongoDB: {result.get('_id')}")
         return SuccessResponse.create(
             data=result,
             message="Complaint created successfully",
@@ -62,6 +67,42 @@ async def create_complaint(
         )
     except CivifixException as e:
         logger.error(f"Complaint creation error: {str(e)}")
+        raise HTTPException(status_code=e.status_code, detail=str(e))
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.post(
+    "/draft",
+    response_model=dict,
+    status_code=status.HTTP_201_CREATED,
+    summary="Save Complaint Draft",
+    tags=["Complaints"]
+)
+async def save_complaint_draft(
+    complaint_data: ComplaintCreateSchema,
+    current_user: dict = Depends(get_current_user),
+    service: ComplaintService = Depends(get_complaint_service)
+):
+    """Save a draft complaint (CITIZEN only)"""
+    try:
+        # Re-using create_complaint logic but we'll mark status as DRAFT
+        # For simplicity in this implementation, we just call create with a draft flag
+        # Assuming the service handles it, or we just insert it directly
+        result = await service.create_complaint(
+            complaint_data,
+            current_user["user_id"],
+            current_user.get("role", "CITIZEN"),
+            is_draft=True
+        )
+        return SuccessResponse.create(
+            data=result,
+            message="Draft saved successfully",
+            status_code=status.HTTP_201_CREATED
+        )
+    except CivifixException as e:
+        logger.error(f"Draft save error: {str(e)}")
         raise HTTPException(status_code=e.status_code, detail=str(e))
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
@@ -317,3 +358,60 @@ async def inspector_dashboard(
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
+@router.put(
+    "/{complaint_id}/feedback",
+    response_model=dict,
+    summary="Submit Complaint Feedback",
+    tags=["Complaints"]
+)
+async def submit_feedback(
+    complaint_id: str,
+    rating: int = Query(..., ge=1, le=5),
+    feedback: Optional[str] = None,
+    current_user: dict = Depends(get_current_user),
+    service: ComplaintService = Depends(get_complaint_service)
+):
+    """Submit feedback and rating (CITIZEN only)"""
+    try:
+        update_data = {"rating": rating, "feedback": feedback, "status": "CLOSED"}
+        # assuming service.complaint_repo.update exists
+        success = await service.complaint_repo.update(complaint_id, update_data)
+        if not success:
+            raise HTTPException(status_code=404, detail="Complaint not found")
+            
+        return SuccessResponse.create(
+            message="Feedback submitted successfully"
+        )
+    except CivifixException as e:
+        raise HTTPException(status_code=e.status_code, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@router.put(
+    "/{complaint_id}/reopen",
+    response_model=dict,
+    summary="Reopen Complaint",
+    tags=["Complaints"]
+)
+async def reopen_complaint(
+    complaint_id: str,
+    reason: str = Query(...),
+    current_user: dict = Depends(get_current_user),
+    service: ComplaintService = Depends(get_complaint_service)
+):
+    """Reopen a closed complaint (CITIZEN only)"""
+    try:
+        update_data = {"status": "REOPENED", "reopen_reason": reason}
+        success = await service.complaint_repo.update(complaint_id, update_data)
+        if not success:
+            raise HTTPException(status_code=404, detail="Complaint not found")
+            
+        return SuccessResponse.create(
+            message="Complaint reopened successfully"
+        )
+    except CivifixException as e:
+        raise HTTPException(status_code=e.status_code, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error")
+

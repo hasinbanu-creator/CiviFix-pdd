@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { AuthContext } from "../context/AuthContext";
 import AuthStack from "./AuthStack";
 import AppStack from "./AppStack";
+import AdminStack from "./AdminStack";
 import { COLORS } from "../constants/theme";
 
 export const RootNavigator = () => {
@@ -43,7 +44,15 @@ export const RootNavigator = () => {
 
   return (
     <NavigationContainer>
-      {userToken && !isSignout ? <AppStack /> : <AuthStack />}
+      {userToken && !isSignout ? (
+        ["SUPER_ADMIN", "DISTRICT_ADMIN"].includes(auth.user?.role) ? (
+          <AdminStack />
+        ) : (
+          <AppStack />
+        )
+      ) : (
+        <AuthStack />
+      )}
     </NavigationContainer>
   );
 };

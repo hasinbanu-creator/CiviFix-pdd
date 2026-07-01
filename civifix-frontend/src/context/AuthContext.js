@@ -1,7 +1,9 @@
-import React, { createContext, useEffect, useCallback } from "react";
+import React, { createContext, useEffect, useCallback, useState } from "react";
+import { DeviceEventEmitter, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import authService from "../services/authService";
 import { getErrorMessage } from "../services/api";
+import notificationService from "../services/notificationService";
 
 export const AuthContext = createContext();
 
@@ -68,6 +70,15 @@ export const AuthProvider = ({ children }) => {
       }
     };
     bootstrapAsync();
+
+    const sessionSub = DeviceEventEmitter.addListener('SESSION_EXPIRED', () => {
+      Alert.alert("Session Expired", "Please log in again.");
+      dispatch({ type: "SIGN_OUT" });
+    });
+
+    return () => {
+      sessionSub.remove();
+    };
   }, []);
 
   const authContext = {
@@ -98,8 +109,15 @@ export const AuthProvider = ({ children }) => {
         dispatch({ type: "SET_ERROR", payload: null });
         const response = await authService.verifyLogin(email, otp);
         const user = await authService.getProfile();
+        
         dispatch({ type: "SET_USER", payload: user });
         dispatch({ type: "SIGN_IN", payload: response.access_token });
+        
+        // Push notification hook
+        notificationService.registerForPushNotificationsAsync().then(token => {
+          notificationService.syncTokenWithServer(token);
+        });
+
         return response;
       } catch (error) {
         dispatch({ type: "SET_ERROR", payload: getErrorMessage(error) });

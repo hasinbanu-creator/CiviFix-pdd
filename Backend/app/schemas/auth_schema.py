@@ -123,6 +123,20 @@ class UserInfoSchema(BaseModel):
         }
 
 
+class UpdateProfileSchema(BaseModel):
+    """Schema for updating user profile"""
+    name: Optional[str] = Field(None, min_length=2, max_length=100)
+    mobile_number: Optional[str] = Field(None, min_length=10, max_length=10)
+    address: Optional[str] = Field(None, min_length=5, max_length=200)
+
+    class Config:
+        example = {
+            "name": "Shakthi Updated",
+            "mobile_number": "9876543211",
+            "address": "New Chennai Address"
+        }
+
+
 class LogoutSchema(BaseModel):
     """Logout schema"""
     refresh_token: Optional[str] = None

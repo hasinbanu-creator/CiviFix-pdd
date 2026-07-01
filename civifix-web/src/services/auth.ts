@@ -35,14 +35,17 @@ const storeSession = (session: UserSession) => {
 
 const e2eMocksEnabled = process.env.NEXT_PUBLIC_E2E_MOCKS === "true";
 
-const e2eUser: UserProfile = {
-  id: "e2e-user-1",
-  email: "selenium-test@civifix.local",
-  name: "Selenium Citizen",
-  role: "CITIZEN",
-  mobile_number: "9876543210",
-  district: "e2e-district-1",
-  district_id: "e2e-district-1",
+const getE2EUser = (): UserProfile => {
+  const role = typeof window !== "undefined" ? (localStorage.getItem("e2eRole") || "CITIZEN") : "CITIZEN";
+  return {
+    id: "e2e-user-1",
+    email: "selenium-test@civifix.local",
+    name: "Selenium " + role,
+    role: role,
+    mobile_number: "9876543210",
+    district: "e2e-district-1",
+    district_id: "e2e-district-1",
+  };
 };
 
 const e2eComplaints = [
@@ -89,7 +92,7 @@ const e2eWards = [
 const e2eSession = (): UserSession => ({
   access_token: "e2e-access-token",
   refresh_token: "e2e-refresh-token",
-  user: e2eUser,
+  user: getE2EUser(),
 });
 
 export const authService = {
@@ -143,13 +146,13 @@ export const authService = {
   },
 
   getProfile: async (): Promise<UserProfile> => {
-    if (e2eMocksEnabled) return e2eUser;
+    if (e2eMocksEnabled) return getE2EUser();
     const response = await api.get(ENDPOINTS.GET_PROFILE);
     return unwrapResponse<UserProfile>(response);
   },
 
   updateProfile: async (userData: any): Promise<UserProfile> => {
-    if (e2eMocksEnabled) return { ...e2eUser, ...userData };
+    if (e2eMocksEnabled) return { ...getE2EUser(), ...userData };
     const response = await api.put(ENDPOINTS.UPDATE_PROFILE, userData);
     return unwrapResponse<UserProfile>(response);
   },
@@ -211,7 +214,7 @@ export const authService = {
   },
 
   getMe: async (): Promise<UserProfile> => {
-    if (e2eMocksEnabled) return e2eUser;
+    if (e2eMocksEnabled) return getE2EUser();
     const res = await api.get(ENDPOINTS.GET_PROFILE);
     return unwrapResponse<UserProfile>(res);
   },

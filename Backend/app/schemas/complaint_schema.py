@@ -180,6 +180,8 @@ class ComplaintResponseSchema(BaseModel):
     address: Optional[str]
     image_urls: List[str]
     proof_images: List[str]
+    inspector_notes: Optional[List[dict]] = Field(default_factory=list)
+    field_checklist: Optional[dict] = Field(default_factory=dict)
     citizen_note: Optional[str]
     inspector_note: Optional[str]
     worker_note: Optional[str]

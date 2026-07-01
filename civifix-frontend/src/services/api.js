@@ -11,6 +11,12 @@ export const unwrapResponse = (response) => response?.data?.data ?? response?.da
 
 export const getErrorMessage = (error, fallback = "Something went wrong") => {
   const data = error?.response?.data;
+  if (data?.detail && Array.isArray(data.detail)) {
+    return data.detail.map(err => `${err.loc?.join(".")}: ${err.msg}`).join("\n");
+  }
+  if (data?.message && Array.isArray(data.message)) {
+    return data.message.join("\n");
+  }
   return data?.message || data?.detail || data?.errors || error?.message || fallback;
 };
 
@@ -52,9 +58,26 @@ api.interceptors.response.use(
       } catch (refreshError) {
         await AsyncStorage.removeItem("authToken");
         await AsyncStorage.removeItem("refreshToken");
+        import('react-native').then(({ DeviceEventEmitter }) => {
+          DeviceEventEmitter.emit('SESSION_EXPIRED');
+        });
         return Promise.reject(refreshError);
       }
     }
+    
+    // Also handle 403 or 503 globally if needed
+    if (error.response?.status === 403 || error.response?.status === 503) {
+      import('react-native').then(({ DeviceEventEmitter }) => {
+        DeviceEventEmitter.emit('GLOBAL_ERROR', error.response.status);
+      });
+    }
+
+    if (error.code === 'ECONNREFUSED' || error.message === 'Network Error') {
+        console.error(`[Network Error] Could not connect to API at ${error.config?.baseURL}. This is often because the backend is not running, or running on 127.0.0.1 instead of 0.0.0.0.`);
+    } else {
+        console.error(`[API Error] ${error.response?.status}: ${error.message}`, error.response?.data);
+    }
+    
     return Promise.reject(error);
   }
 );
