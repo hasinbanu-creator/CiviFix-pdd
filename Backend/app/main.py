@@ -17,6 +17,7 @@ from app.core.exceptions import (
     CivifixException
 )
 from fastapi import HTTPException
+from fastapi.exceptions import RequestValidationError
 from app.core.logger import setup_logging
 from app.schemas.common_schema import HealthCheckSchema
 from app.api.v1.auth_routes import router as auth_router
@@ -86,6 +87,19 @@ async def http_exception_handler(request: Request, exc: HTTPException):
             "success": False,
             "message": exc.detail,
             "error_code": "HTTP_ERROR"
+        }
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    logger.error(f"Validation Error: {exc.errors()}")
+    logger.error(f"Body: {exc.body}")
+    return JSONResponse(
+        status_code=422,
+        content={
+            "success": False,
+            "message": "Validation error",
+            "detail": exc.errors()
         }
     )
 

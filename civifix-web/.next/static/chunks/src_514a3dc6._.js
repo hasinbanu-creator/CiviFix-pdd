@@ -59,7 +59,6 @@ __turbopack_context__.s([
     "unwrapResponse",
     ()=>unwrapResponse
 ]);
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = /*#__PURE__*/ __turbopack_context__.i("[project]/node_modules/next/dist/build/polyfills/process.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/axios/lib/axios.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$constants$2f$endpoints$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/constants/endpoints.ts [app-client] (ecmascript)");
 ;
@@ -81,8 +80,14 @@ const getErrorMessage = function(error) {
     return (data === null || data === void 0 ? void 0 : data.message) || (data === null || data === void 0 ? void 0 : data.detail) || (data === null || data === void 0 ? void 0 : data.errors) || (error === null || error === void 0 ? void 0 : error.message) || fallback;
 };
 api.interceptors.request.use((config)=>{
-    if ("TURBOPACK compile-time truthy", 1) {
-        console.log("API request:", api.getUri(config));
+    console.log("--- OUTGOING API REQUEST ---");
+    console.log("URL:", api.getUri(config));
+    console.log("Headers:", config.headers);
+    console.log("Data:", config.data instanceof FormData ? "[FormData Object]" : config.data);
+    if (config.data instanceof FormData) {
+        for (let [key, value] of config.data.entries()){
+            console.log("  ".concat(key, ":"), value);
+        }
     }
     if ("TURBOPACK compile-time truthy", 1) {
         const token = localStorage.getItem("authToken");

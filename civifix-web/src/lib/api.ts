@@ -18,8 +18,14 @@ export const getErrorMessage = (error: any, fallback = "Something went wrong"): 
 
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    if (process.env.NEXT_PUBLIC_ENABLE_DEBUG === "true") {
-      console.log("API request:", api.getUri(config));
+    console.log("--- OUTGOING API REQUEST ---");
+    console.log("URL:", api.getUri(config));
+    console.log("Headers:", config.headers);
+    console.log("Data:", config.data instanceof FormData ? "[FormData Object]" : config.data);
+    if (config.data instanceof FormData) {
+      for (let [key, value] of config.data.entries()) {
+        console.log(`  ${key}:`, value);
+      }
     }
 
     if (typeof window !== "undefined") {

@@ -127,18 +127,30 @@ export default function CreateComplaintPage() {
     setServerError("");
     try {
       const formData = new FormData();
+      
+      // The backend uses FastAPI Form(...) which expects multipart/form-data
+      // We must append fields exactly as named in the Pydantic ComplaintCreateSchema
       formData.append("ward_id", form.ward_id);
       formData.append("complaint_type", form.complaint_type);
       formData.append("description", form.description);
-      formData.append("priority", form.priority);
-      formData.append("latitude", form.latitude);
-      formData.append("longitude", form.longitude);
-      if (form.address) formData.append("address", form.address);
-      if (form.citizen_note) formData.append("citizen_note", form.citizen_note.trim());
+      formData.append("latitude", String(form.latitude));
+      formData.append("longitude", String(form.longitude));
+      
+      // Priority must be sent if we want to override the default
+      if (form.priority) {
+        formData.append("priority", form.priority);
+      }
+      
+      if (form.address) {
+        formData.append("address", form.address);
+      }
+      
+      if (form.citizen_note) {
+        formData.append("citizen_note", form.citizen_note.trim());
+      }
       
       if (selectedImages.length === 0) {
-        // FastAPI throws 422 if List[UploadFile] is missing entirely from multipart/form-data
-        // Append an empty blob to satisfy the field presence, backend skips empty filenames
+        // If image upload is disabled or not used, we MUST still satisfy the backend's List[UploadFile] expectation
         formData.append("images", new Blob([""], { type: "application/octet-stream" }), "");
       } else {
         selectedImages.forEach((file) => {
@@ -146,12 +158,8 @@ export default function CreateComplaintPage() {
         });
       }
       
-      // LOG PAYLOAD AS REQUESTED
-      console.log("Submitting Complaint Payload:");
-      formData.forEach((value, key) => {
-        console.log(`- ${key}:`, value);
-      });
-
+      console.log("Submitting Complaint as multipart/form-data");
+      // Pass the FormData object directly; axios will automatically set the correct headers and boundaries.
       const result = await createComplaint.mutateAsync(formData as any);
       setCreatedComplaint(result);
       setShowSuccess(true);

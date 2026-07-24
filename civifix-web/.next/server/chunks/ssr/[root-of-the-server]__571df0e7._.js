@@ -174,8 +174,14 @@ const getErrorMessage = (error, fallback = "Something went wrong")=>{
     return data?.message || data?.detail || data?.errors || error?.message || fallback;
 };
 api.interceptors.request.use((config)=>{
-    if ("TURBOPACK compile-time truthy", 1) {
-        console.log("API request:", api.getUri(config));
+    console.log("--- OUTGOING API REQUEST ---");
+    console.log("URL:", api.getUri(config));
+    console.log("Headers:", config.headers);
+    console.log("Data:", config.data instanceof FormData ? "[FormData Object]" : config.data);
+    if (config.data instanceof FormData) {
+        for (let [key, value] of config.data.entries()){
+            console.log(`  ${key}:`, value);
+        }
     }
     if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
     ;
