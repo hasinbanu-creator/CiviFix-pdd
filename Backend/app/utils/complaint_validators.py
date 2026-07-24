@@ -72,8 +72,8 @@ class DuplicateComplaintDetector:
     """Detects duplicate complaints"""
 
     # Configuration
-    DUPLICATE_CHECK_DAYS = 1
-    DUPLICATE_DISTANCE_METERS = 10  # 10 meters radius (relaxed for testing)
+    DUPLICATE_CHECK_DAYS = 7
+    DUPLICATE_DISTANCE_METERS = 20  # 20 meters radius
 
     @staticmethod
     def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:

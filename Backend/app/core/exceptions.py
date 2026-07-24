@@ -10,11 +10,13 @@ class CivifixException(Exception):
         self,
         message: str,
         status_code: int = status.HTTP_400_BAD_REQUEST,
-        error_code: Optional[str] = None
+        error_code: Optional[str] = None,
+        extra_data: Optional[dict] = None
     ):
         self.message = message
         self.status_code = status_code
         self.error_code = error_code
+        self.extra_data = extra_data
         super().__init__(self.message)
 
 
@@ -43,6 +45,29 @@ class AuthorizationException(CivifixException):
             message=message,
             status_code=status.HTTP_403_FORBIDDEN,
             error_code=error_code
+        )
+
+
+class DuplicateComplaintException(CivifixException):
+    """Raised when a duplicate complaint is detected"""
+    def __init__(
+        self,
+        message: str = "A similar complaint already exists nearby.",
+        error_code: str = "DUPLICATE_COMPLAINT",
+        existing_complaint_id: str = "",
+        distance_meters: float = 0.0,
+        existing_status: str = ""
+    ):
+        extra_data = {
+            "existing_complaint_id": existing_complaint_id,
+            "distance_meters": distance_meters,
+            "existing_status": existing_status
+        }
+        super().__init__(
+            message=message,
+            status_code=status.HTTP_409_CONFLICT,
+            error_code=error_code,
+            extra_data=extra_data
         )
 
 
@@ -197,6 +222,9 @@ async def civifix_exception_handler(
         "error_code": exc.error_code
     }
     
+    if getattr(exc, 'extra_data', None):
+        content.update(exc.extra_data)
+
     if isinstance(exc, ValidationException) and exc.errors:
         content["errors"] = exc.errors
     

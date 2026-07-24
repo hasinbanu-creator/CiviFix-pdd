@@ -14,7 +14,8 @@ from app.schemas.complaint_schema import (
     ComplaintApproveSchema, ComplaintRejectSchema
 )
 from app.core.exceptions import (
-    CivifixException, ResourceNotFoundError, ValidationError, UnauthorizedError
+    CivifixException, ResourceNotFoundError, ValidationError, UnauthorizedError,
+    DuplicateComplaintException
 )
 from app.core.enums import ComplaintStatus, Roles
 from app.utils.complaint_validators import (
@@ -98,7 +99,18 @@ class ComplaintService:
                 days=7
             )
 
+            # Define statuses that are considered for duplicate detection
+            duplicate_check_statuses = [
+                ComplaintStatus.PENDING, 
+                ComplaintStatus.ASSIGNED, 
+                ComplaintStatus.IN_PROGRESS
+            ]
+
             for existing in nearby_complaints:
+                existing_status = existing.get("status")
+                if existing_status not in duplicate_check_statuses:
+                    continue
+                    
                 distance = DuplicateComplaintDetector.calculate_distance(
                     complaint_data.latitude,
                     complaint_data.longitude,
@@ -106,9 +118,21 @@ class ComplaintService:
                     existing.get("longitude")
                 )
 
+                logger.info(
+                    f"[Duplicate Check] Evaluated complaint {existing.get('complaint_id')} | "
+                    f"Existing Coords: ({existing.get('latitude')}, {existing.get('longitude')}) | "
+                    f"Incoming Coords: ({complaint_data.latitude}, {complaint_data.longitude}) | "
+                    f"Distance: {distance:.2f}m | Type: {complaint_data.complaint_type} | "
+                    f"Ward: {complaint_data.ward_id} | Status: {existing_status} | "
+                    f"Created: {existing.get('created_at')}"
+                )
+
                 if distance <= DuplicateComplaintDetector.DUPLICATE_DISTANCE_METERS:
-                    raise ValidationError(
-                        f"A similar complaint already exists in this location (ID: {existing.get('complaint_id')})"
+                    logger.warning(f"Duplicate complaint blocked: matches {existing.get('complaint_id')} at {distance:.2f}m")
+                    raise DuplicateComplaintException(
+                        existing_complaint_id=existing.get("complaint_id"),
+                        distance_meters=round(distance, 2),
+                        existing_status=existing_status
                     )
 
             complaint_doc = complaint_document(complaint_data)
