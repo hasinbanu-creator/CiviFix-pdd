@@ -29,7 +29,7 @@ class SeleniumTestRunner:
         try:
             # Generate Extent HTML report using pytest-html
             result = subprocess.run(
-                ["pytest", "test_scenarios.py", "-v", "--tb=short", "--html=ExtentReport.html", "--self-contained-html"],
+                ["pytest", "test_massive_e2e.py", "-v", "--tb=short", "--html=ExtentReport.html", "--self-contained-html"],
                 capture_output=True,
                 text=True
             )

@@ -35,6 +35,9 @@ jobs:
         # Create output directories for logs and screenshots
         mkdir -p Screenshots Logs
         
+        # Generate the massive 400-test suite dynamically
+        python generate_test_file.py
+        
         # Run the wrapper script that triggers Pytest and builds the Excel Report
         python run_tests.py
         
