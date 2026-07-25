@@ -9,6 +9,9 @@ class Reporter:
         self.excel_dir = os.path.join(self.reports_dir, "excel")
         self.html_dir = os.path.join(self.reports_dir, "html")
         
+        os.makedirs(self.excel_dir, exist_ok=True)
+        os.makedirs(self.html_dir, exist_ok=True)
+        
     def generate_excel_report(self, test_results, summary):
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         filename = os.path.join(self.excel_dir, f"Mock_Test_Execution_Report_{timestamp}.xlsx")
