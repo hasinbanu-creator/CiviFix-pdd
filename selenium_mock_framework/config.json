@@ -1,0 +1,7 @@
+{
+  "mode": "mock",
+  "browser": "chrome",
+  "base_url": "http://localhost:8000",
+  "mock_test_count": 500,
+  "implicit_wait": 10
+}
